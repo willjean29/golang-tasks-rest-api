@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
 
 type task struct {
 	ID      int    `json:"id"`
@@ -17,7 +23,14 @@ var tasks = ListTask{
 	},
 }
 
+func indexRoute(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to my API!")
+}
+
 func main() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", indexRoute)
 	fmt.Println("Hello, World!")
 	fmt.Println(tasks)
+	log.Fatal(http.ListenAndServe(":4000", router))
 }
