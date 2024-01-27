@@ -31,6 +31,24 @@ var tasks = ListTask{
 	},
 }
 
+func getTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fmt.Println(vars)
+	taskID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		fmt.Fprintf(w, "Invalid ID")
+		return
+	}
+	for _, task := range tasks {
+		if task.ID == taskID {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(task)
+			return
+		}
+	}
+	fmt.Fprintf(w, "Task not found")
+}
+
 func getTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -51,6 +69,49 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newTask)
 }
 
+func deleteTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		fmt.Fprintf(w, "Invalid ID")
+		return
+	}
+	for index, task := range tasks {
+		if task.ID == taskID {
+			tasks = append(tasks[:index], tasks[index+1:]...)
+			fmt.Fprintf(w, "The task with ID %v has been remove successfully", taskID)
+		}
+	}
+	fmt.Fprintf(w, "Task not found")
+}
+
+func updateTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskID, err := strconv.Atoi(vars["id"])
+	var updatedTask task
+	if err != nil {
+		fmt.Fprintf(w, "Invalid ID")
+		return
+	}
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Please enter valid data")
+		return
+	}
+
+	json.Unmarshal(reqBody, &updatedTask)
+
+	for index, task := range tasks {
+		if task.ID == taskID {
+			tasks = append(tasks[:index], tasks[index+1:]...)
+			updatedTask.ID = task.ID
+			tasks = append(tasks, updatedTask)
+			fmt.Fprintf(w, "The task with ID %v has been updated successfully", taskID)
+		}
+	}
+	fmt.Fprintf(w, "Task not found")
+}
+
 func indexRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to my API!")
 }
@@ -61,8 +122,11 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", indexRoute)
-	router.HandleFunc("/tasks", getTasks).Methods("GET")
-	router.HandleFunc("/tasks", createTask).Methods("POST")
+	router.HandleFunc("/tasks", getTasks).Methods(http.MethodGet)
+	router.HandleFunc("/tasks", createTask).Methods(http.MethodPost)
+	router.HandleFunc("/tasks/{id}", getTask).Methods(http.MethodGet)
+	router.HandleFunc("/tasks/{id}", deleteTask).Methods(http.MethodDelete)
+	router.HandleFunc("/tasks/{id}", updateTask).Methods(http.MethodPut)
 
 	fmt.Println("Running on port ", port)
 
