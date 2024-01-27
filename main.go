@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -21,6 +24,31 @@ var tasks = ListTask{
 		Name:    "Task One",
 		Content: "Some Content",
 	},
+	{
+		ID:      2,
+		Name:    "Task Two",
+		Content: "Some Content",
+	},
+}
+
+func getTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(tasks)
+}
+
+func createTask(w http.ResponseWriter, r *http.Request) {
+	var newTask task
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Insert a Valid Task Data")
+	}
+	json.Unmarshal(reqBody, &newTask)
+	newTask.ID = len(tasks) + 1
+	tasks = append(tasks, newTask)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newTask)
 }
 
 func indexRoute(w http.ResponseWriter, r *http.Request) {
@@ -28,9 +56,15 @@ func indexRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	var defaultPort int64 = 4000
+	port := strconv.FormatInt(defaultPort, 10)
 	router := mux.NewRouter().StrictSlash(true)
+
 	router.HandleFunc("/", indexRoute)
-	fmt.Println("Hello, World!")
-	fmt.Println(tasks)
-	log.Fatal(http.ListenAndServe(":4000", router))
+	router.HandleFunc("/tasks", getTasks).Methods("GET")
+	router.HandleFunc("/tasks", createTask).Methods("POST")
+
+	fmt.Println("Running on port ", port)
+
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
