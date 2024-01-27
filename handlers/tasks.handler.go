@@ -12,7 +12,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetTask(w http.ResponseWriter, r *http.Request) {
+type TaskHandler struct{}
+
+func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -29,13 +31,13 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Task not found")
 }
 
-func GetTasks(w http.ResponseWriter, r *http.Request) {
+func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(data.Tasks)
 }
 
-func CreateTask(w http.ResponseWriter, r *http.Request) {
+func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	var newTask models.Task
 	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -49,7 +51,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newTask)
 }
 
-func DeleteTask(w http.ResponseWriter, r *http.Request) {
+func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -65,7 +67,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Task not found")
 }
 
-func UpdateTask(w http.ResponseWriter, r *http.Request) {
+func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 	var updatedTask models.Task

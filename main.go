@@ -2,6 +2,7 @@ package main
 
 import (
 	"app/handlers"
+	"app/routes"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,11 +17,8 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", handlers.IndexRoute)
-	router.HandleFunc("/tasks", handlers.GetTasks).Methods(http.MethodGet)
-	router.HandleFunc("/tasks", handlers.CreateTask).Methods(http.MethodPost)
-	router.HandleFunc("/tasks/{id}", handlers.GetTask).Methods(http.MethodGet)
-	router.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods(http.MethodDelete)
-	router.HandleFunc("/tasks/{id}", handlers.UpdateTask).Methods(http.MethodPut)
+
+	routes.TaskRoutes(router)
 
 	fmt.Println("Running on port ", port)
 
