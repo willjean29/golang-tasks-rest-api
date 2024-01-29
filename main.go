@@ -1,9 +1,9 @@
 package main
 
 import (
+	"app/db"
 	"app/handlers"
 	"app/routes"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,6 +13,7 @@ import (
 
 func main() {
 	var defaultPort int64 = 4000
+	db.DBConnection()
 	port := strconv.FormatInt(defaultPort, 10)
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -20,7 +21,7 @@ func main() {
 
 	routes.TaskRoutes(router)
 
-	fmt.Println("Running on port ", port)
+	log.Println("Running on port ", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
