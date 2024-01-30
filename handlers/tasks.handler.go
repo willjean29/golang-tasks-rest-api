@@ -5,17 +5,17 @@ import (
 	"app/error"
 	"app/models"
 	"app/services"
+	"app/validators"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
 var taskService services.TaskService = services.TaskService{}
+var taskValidator validators.TaskValidator = validators.NewTaskValidator()
 
 type TaskHandler struct{}
 
@@ -57,8 +57,6 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 
 func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var validate *validator.Validate
-	validate = validator.New(validator.WithRequiredStructEnabled())
 
 	var newTask models.Task
 	var createTaskDto dtos.CreateTaskDto
@@ -72,7 +70,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &createTaskDto)
 
-	err = validate.Struct(createTaskDto)
+	err = taskValidator.ValidateCreateTask(createTaskDto)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
@@ -119,8 +117,6 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var validate *validator.Validate
-	validate = validator.New(validator.WithRequiredStructEnabled())
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 	var updatedTask models.Task
@@ -128,9 +124,7 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error: ", err)
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
-
 		return
 	}
 
@@ -141,15 +135,16 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.Unmarshal(reqBody, &updatedTask)
 	json.Unmarshal(reqBody, &updateTaskDto)
-	err = validate.Struct(updateTaskDto)
+
+	err = taskValidator.ValidateUpdateTask(updateTaskDto)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
 
+	json.Unmarshal(reqBody, &updatedTask)
 	updatedTask, err = taskService.UpdateTask(updatedTask, taskID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
