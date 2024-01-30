@@ -5,9 +5,9 @@ import (
 	"app/error"
 	"app/models"
 	"app/services"
+	"app/utils"
 	"app/validators"
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -60,15 +60,14 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	var newTask models.Task
 	var createTaskDto dtos.CreateTaskDto
-	reqBody, err := io.ReadAll(r.Body)
+
+	err := utils.TransformBody(r.Body, &createTaskDto, &newTask)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-
-	json.Unmarshal(reqBody, &createTaskDto)
 
 	err = taskValidator.ValidateCreateTask(createTaskDto)
 	if err != nil {
@@ -76,8 +75,6 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-
-	json.Unmarshal(reqBody, &newTask)
 
 	newTask, err = taskService.CreateTask(newTask)
 	if err != nil {
@@ -117,10 +114,9 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
-	var updatedTask models.Task
-	var updateTaskDto dtos.UpdateTaskDto
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -128,14 +124,15 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqBody, err := io.ReadAll(r.Body)
+	var updatedTask models.Task
+	var updateTaskDto dtos.UpdateTaskDto
+	err = utils.TransformBody(r.Body, &updateTaskDto, &updatedTask)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Please enter valid data", http.StatusBadRequest, err))
 		return
 	}
-
-	json.Unmarshal(reqBody, &updateTaskDto)
 
 	err = taskValidator.ValidateUpdateTask(updateTaskDto)
 	if err != nil {
@@ -144,7 +141,6 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.Unmarshal(reqBody, &updatedTask)
 	updatedTask, err = taskService.UpdateTask(updatedTask, taskID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
