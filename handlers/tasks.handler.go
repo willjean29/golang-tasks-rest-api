@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"app/db"
 	"app/dtos"
 	"app/error"
 	"app/models"
+	"app/services"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,11 +15,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var taskService services.TaskService = services.TaskService{}
+
 type TaskHandler struct{}
 
 func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var task models.Task
+
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -29,9 +31,7 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	findTask := db.DB.First(&task, taskID)
-	err = findTask.Error
-
+	task, err := taskService.GetTask(taskID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
@@ -44,14 +44,14 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var tasks models.ListTask
-	findtasks := db.DB.Find(&tasks)
-	err := findtasks.Error
+
+	tasks, err := taskService.GetTasks()
 	if err != nil {
 		w.WriteHeader(http.StatusFound)
 		json.NewEncoder(w).Encode(error.New("Data of tasks not found", http.StatusFound, err))
 		return
 	}
+
 	json.NewEncoder(w).Encode(tasks)
 }
 
@@ -80,9 +80,8 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.Unmarshal(reqBody, &newTask)
-	createdTak := db.DB.Create(&newTask)
-	err = createdTak.Error
 
+	newTask, err = taskService.CreateTask(newTask)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
@@ -97,7 +96,6 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var task models.Task
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -107,10 +105,8 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	findTask := db.DB.Delete(&task, taskID)
-	rowsAffected := findTask.RowsAffected
-
-	if rowsAffected == 0 {
+	err = taskService.DeleteTask(taskID)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
 		return
@@ -154,9 +150,8 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := db.DB.Where("id = ?", taskID).Updates(updatedTask)
-	rowsAffected := query.RowsAffected
-	if rowsAffected == 0 {
+	updatedTask, err = taskService.UpdateTask(updatedTask, taskID)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
 		return
