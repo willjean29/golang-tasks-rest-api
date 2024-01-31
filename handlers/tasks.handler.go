@@ -29,10 +29,10 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := taskService.GetTask(taskID)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
+	task, errorApp := taskService.GetTask(taskID)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
@@ -41,10 +41,10 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, err := taskService.GetTasks()
-	if err != nil {
-		w.WriteHeader(http.StatusFound)
-		json.NewEncoder(w).Encode(error.New("Data of tasks not found", http.StatusFound, err))
+	tasks, errorApp := taskService.GetTasks()
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	var newTask models.Task
 	var createTaskDto dtos.CreateTaskDto
-
+	var errorApp error.Error
 	err := utils.TransformBody(r.Body, &createTaskDto, &newTask)
 
 	if err != nil {
@@ -70,10 +70,10 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTask, err = taskService.CreateTask(newTask)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
+	newTask, errorApp = taskService.CreateTask(newTask)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
@@ -93,10 +93,10 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = taskService.DeleteTask(taskID)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
+	errorApp := taskService.DeleteTask(taskID)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
@@ -117,6 +117,7 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	var updatedTask models.Task
 	var updateTaskDto dtos.UpdateTaskDto
+	var errorApp error.Error
 	err = utils.TransformBody(r.Body, &updateTaskDto, &updatedTask)
 
 	if err != nil {
@@ -132,10 +133,10 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedTask, err = taskService.UpdateTask(updatedTask, taskID)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(error.New("Task not found", http.StatusNotFound, err))
+	updatedTask, errorApp = taskService.UpdateTask(updatedTask, taskID)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
