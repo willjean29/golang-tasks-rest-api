@@ -22,15 +22,21 @@ func main() {
 	port := strconv.FormatInt(defaultPort, 10)
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/", handlers.IndexRoute)
-
-	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(error.New("Endpoint not found", http.StatusFound, errors.New("Not found - "+r.URL.Path)))
+	router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Println(r.Method, r.URL.Path)
+			w.Header().Set("Content-Type", "application/json")
+			next.ServeHTTP(w, r)
+		})
 	})
 
+	router.HandleFunc("/", handlers.IndexRoute)
 	routes.TaskRoutes(router)
+
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(error.New("Endpoint not found", http.StatusNotFound, errors.New("Not found - "+r.URL.Path)))
+	})
 
 	log.Println("Running on port ", port)
 

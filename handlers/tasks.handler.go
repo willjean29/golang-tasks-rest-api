@@ -20,8 +20,6 @@ var taskValidator validators.TaskValidator = validators.NewTaskValidator()
 type TaskHandler struct{}
 
 func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -43,8 +41,6 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	tasks, err := taskService.GetTasks()
 	if err != nil {
 		w.WriteHeader(http.StatusFound)
@@ -56,8 +52,6 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var newTask models.Task
 	var createTaskDto dtos.CreateTaskDto
 
@@ -90,7 +84,6 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -113,8 +106,6 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
