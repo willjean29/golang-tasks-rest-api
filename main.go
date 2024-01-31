@@ -2,9 +2,12 @@ package main
 
 import (
 	"app/db"
+	"app/error"
 	"app/handlers"
 	"app/models"
 	"app/routes"
+	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,6 +23,12 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", handlers.IndexRoute)
+
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(error.New("Endpoint not found", http.StatusFound, errors.New("Not found - "+r.URL.Path)))
+	})
 
 	routes.TaskRoutes(router)
 
