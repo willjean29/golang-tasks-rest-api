@@ -34,6 +34,7 @@ func main() {
 	// routes for application
 	routes.TaskRoutes(router)
 	routes.FilesRoutes(router)
+	routes.UserRoutes(router)
 
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)

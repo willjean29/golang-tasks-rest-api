@@ -10,9 +10,9 @@ import (
 type User struct {
 	gorm.Model
 	Name     string
-	Email    string
+	Email    string `gorm:"unique"`
 	Password string
-	image    string
+	Image    string `gorm:"default:null"`
 }
 
 type UserJSON struct {
@@ -32,7 +32,7 @@ func (u *User) MarshalJSON() ([]byte, error) {
 		Name:      u.Name,
 		Email:     u.Email,
 		Password:  u.Password,
-		Image:     u.image,
+		Image:     u.Image,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		DeletedAt: u.DeletedAt,

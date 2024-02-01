@@ -47,7 +47,7 @@ func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(errorApp)
 			return
 		}
-		task.Url = fileUrl
+		task.Image = fileUrl
 		errorApp = TaskService.SaveTask(&task)
 		if errorApp.StatusCode != 0 {
 			w.WriteHeader(errorApp.StatusCode)
