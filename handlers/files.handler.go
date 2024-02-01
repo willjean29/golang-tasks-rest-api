@@ -12,7 +12,9 @@ import (
 
 var collections = []string{"tasks", "users"}
 
-func UploadFile(w http.ResponseWriter, r *http.Request) {
+type FilesHandler struct{}
+
+func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	var isFoundCollection = false
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
