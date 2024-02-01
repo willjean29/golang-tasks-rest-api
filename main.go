@@ -20,7 +20,7 @@ func main() {
 
 	// connection database
 	db.DBConnection()
-	db.DB.AutoMigrate(&models.Task{})
+	db.DB.AutoMigrate(&models.Task{}, &models.User{})
 
 	port := strconv.FormatInt(defaultPort, 10)
 	router := mux.NewRouter().StrictSlash(true)
@@ -31,6 +31,7 @@ func main() {
 
 	router.Use(middlewares.ContentType)
 
+	// routes for application
 	routes.TaskRoutes(router)
 	routes.FilesRoutes(router)
 
