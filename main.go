@@ -4,6 +4,7 @@ import (
 	"app/db"
 	"app/error"
 	"app/handlers"
+	"app/middlewares"
 	"app/models"
 	"app/routes"
 	"encoding/json"
@@ -13,7 +14,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -56,6 +56,7 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	// Envía una respuesta de éxito
 	json.NewEncoder(w).Encode(map[string]string{"file": handler.Filename, "message": "File uploaded successfully"})
 }
+
 func main() {
 	var defaultPort int64 = 4000
 	db.DBConnection()
@@ -63,18 +64,11 @@ func main() {
 	port := strconv.FormatInt(defaultPort, 10)
 	router := mux.NewRouter().StrictSlash(true)
 
+	// statics files to filesystem
 	fs := http.FileServer(http.Dir("./uploads/"))
 	router.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", fs))
 
-	router.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Println(r.Method, r.URL.Path)
-			if !strings.Contains(r.URL.Path, "/uploads/") && r.Method == http.MethodGet {
-				w.Header().Set("Content-Type", "application/json")
-			}
-			next.ServeHTTP(w, r)
-		})
-	})
+	router.Use(middlewares.ContentType)
 
 	router.HandleFunc("/", handlers.IndexRoute)
 	router.HandleFunc("/upload", uploadFileHandler).Methods(http.MethodPost)
