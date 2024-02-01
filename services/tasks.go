@@ -91,3 +91,21 @@ func (t *TaskService) DeleteTask(id int) error.Error {
 	}
 	return error.Error{}
 }
+
+func (t *TaskService) SaveTask(task *models.Task) error.Error {
+	query := db.DB.Save(&task)
+	err := query.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return *error.New("Task not found", 404, errors.New(err.Error()))
+		} else {
+			return *error.New("Error get task", 500, errors.New(err.Error()))
+		}
+	}
+
+	if query.RowsAffected == 0 {
+		return *error.New("Task not found", 404, errors.New("No task was deleted"))
+	}
+	return error.Error{}
+}

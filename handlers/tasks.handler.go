@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var taskService services.TaskService = services.TaskService{}
+var TaskService services.TaskService = services.TaskService{}
 var taskValidator validators.TaskValidator = validators.NewTaskValidator()
 
 type TaskHandler struct{}
@@ -29,7 +29,7 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, errorApp := taskService.GetTask(taskID)
+	task, errorApp := TaskService.GetTask(taskID)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -41,7 +41,7 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, errorApp := taskService.GetTasks()
+	tasks, errorApp := TaskService.GetTasks()
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -70,7 +70,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTask, errorApp = taskService.CreateTask(newTask)
+	newTask, errorApp = TaskService.CreateTask(newTask)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -93,7 +93,7 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	errorApp := taskService.DeleteTask(taskID)
+	errorApp := TaskService.DeleteTask(taskID)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -133,7 +133,7 @@ func (t *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedTask, errorApp = taskService.UpdateTask(updatedTask, taskID)
+	updatedTask, errorApp = TaskService.UpdateTask(updatedTask, taskID)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
