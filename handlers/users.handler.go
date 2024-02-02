@@ -4,6 +4,7 @@ import (
 	"app/dtos"
 	"app/error"
 	"app/models"
+	hash "app/providers/HashProvider"
 	"app/services"
 	"app/utils"
 	"app/validators"
@@ -13,6 +14,7 @@ import (
 
 var userValidator validators.UserValidator = validators.NewUserValidator()
 var userService services.UserService = services.UserService{}
+var hashProvider hash.HashProvider = &hash.BcryptProvider{}
 
 type UserHandler struct{}
 
@@ -41,9 +43,10 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Password != loginDto.Password {
+	err = hashProvider.ComparePasswords(user.Password, loginDto.Password)
+	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(error.New("Invalid data (password)", http.StatusUnauthorized, nil))
+		json.NewEncoder(w).Encode(error.New("Invalid data (password)", http.StatusUnauthorized, err))
 		return
 	}
 
@@ -68,6 +71,9 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid data", http.StatusBadRequest, err))
 		return
 	}
+
+	hashPassword, _ := hashProvider.HashPassword(createUserDto.Password)
+	newUser.Password = hashPassword
 
 	errorApp = userService.CreateUser(&newUser)
 	if errorApp.StatusCode != 0 {
