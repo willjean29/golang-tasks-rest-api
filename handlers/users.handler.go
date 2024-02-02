@@ -18,7 +18,7 @@ import (
 var userValidator validators.UserValidator = validators.NewUserValidator()
 var userService services.UserService = services.UserService{}
 var hashProvider hash.HashProvider = &hash.BcryptProvider{}
-var tokenProvider token.TokenProvider = &token.JwtProvider{}
+var tokenProvider token.TokenProvider = token.NewJwtProvider()
 
 type UserHandler struct{}
 
@@ -97,6 +97,19 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
+
+	tokenString, err := tokenProvider.GenerateToken("userId", fmt.Sprintf("%d", newUser.ID))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(error.New("Internal server error", http.StatusInternalServerError, err))
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: time.Now().Add(24 * time.Hour), // Ajusta la duración de la cookie según tus necesidades
+	})
 	userJson, _ := newUser.MarshalJSON()
 	w.Write(userJson)
 }
