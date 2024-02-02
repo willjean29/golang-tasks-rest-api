@@ -11,9 +11,9 @@ import (
 
 type TaskService struct{}
 
-func (t *TaskService) GetTasks() (models.ListTask, error.Error) {
+func (t *TaskService) GetTasks(userId int) (models.ListTask, error.Error) {
 	var tasks models.ListTask
-	query := db.DB.Find(&tasks)
+	query := db.DB.Where("user_id = ?", userId).Find(&tasks)
 	err := query.Error
 
 	if err != nil {

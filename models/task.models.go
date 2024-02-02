@@ -12,6 +12,7 @@ type Task struct {
 	Name    string
 	Content string
 	Image   string `gorm:"default:null"`
+	UserID  uint
 }
 
 type TaskJSON struct {

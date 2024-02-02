@@ -43,7 +43,8 @@ func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, errorApp := TaskService.GetTasks()
+	userID := r.Context().Value("userId").(int)
+	tasks, errorApp := TaskService.GetTasks(userID)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -58,7 +59,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 	var createTaskDto dtos.CreateTaskDto
 	var errorApp error.Error
 	err := utils.TransformBody(r.Body, &createTaskDto, &newTask)
-
+	userID := r.Context().Value("userId").(int)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
@@ -71,7 +72,7 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-
+	newTask.UserID = uint(userID)
 	newTask, errorApp = TaskService.CreateTask(newTask)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)

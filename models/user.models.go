@@ -13,6 +13,7 @@ type User struct {
 	Email    string `gorm:"unique"`
 	Password string
 	Image    string `gorm:"default:null"`
+	Tasks    []Task
 }
 
 type UserJSON struct {
