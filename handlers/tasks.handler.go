@@ -8,6 +8,7 @@ import (
 	"app/utils"
 	"app/validators"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,8 @@ type TaskHandler struct{}
 func (t *TaskHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
-
+	userID := r.Context().Value("userId").(int)
+	log.Println("userId", userID)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))

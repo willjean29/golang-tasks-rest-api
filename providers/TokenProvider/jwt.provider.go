@@ -34,7 +34,7 @@ func (j *JwtProvider) GenerateToken(key string, value string) (string, error) {
 	return tokenString, nil
 }
 
-func (j *JwtProvider) ValidateToken(tokenString string) (bool, error) {
+func (j *JwtProvider) ValidateToken(tokenString string) (bool, map[string]interface{}, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -43,13 +43,12 @@ func (j *JwtProvider) ValidateToken(tokenString string) (bool, error) {
 	})
 
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims["user"])
-		return true, nil
+	if tokenDecoded, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return true, tokenDecoded, nil
 	}
 
-	return false, nil
+	return false, nil, nil
 }
