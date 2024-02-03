@@ -57,6 +57,20 @@ func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"message": "File uploaded successfully"})
 	case "users":
 		log.Println("Upload file for user with id:", id)
+		user, errorApp := userService.GetUser(id)
+		if errorApp.StatusCode != 0 {
+			w.WriteHeader(errorApp.StatusCode)
+			json.NewEncoder(w).Encode(errorApp)
+			return
+		}
+		user.Image = fileUrl
+		errorApp = userService.SaveUser(&user)
+		if errorApp.StatusCode != 0 {
+			w.WriteHeader(errorApp.StatusCode)
+			json.NewEncoder(w).Encode(errorApp)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{"message": "File uploaded successfully"})
 	}
 
 }

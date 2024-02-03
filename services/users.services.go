@@ -79,3 +79,18 @@ func (s *UserService) GetUser(id int) (models.User, error.Error) {
 	}
 	return user, error.Error{}
 }
+func (u *UserService) SaveUser(user *models.User) error.Error {
+	query := db.DB.Save(&user)
+	err := query.Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return *error.New("User not saved", 400, errors.New(err.Error()))
+		} else {
+			return *error.New("Error save user", 500, errors.New(err.Error()))
+		}
+	}
+	if query.RowsAffected == 0 {
+		return *error.New("User not saved", 400, errors.New("User not saved"))
+	}
+	return error.Error{}
+}
