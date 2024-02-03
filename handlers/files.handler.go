@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"app/error"
+	store "app/providers/StorageProvider"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 )
 
 var collections = []string{"tasks", "users"}
+var storeProvider store.StoreProvider = &store.DiskProvider{}
 
 type FilesHandler struct{}
 
@@ -37,7 +39,7 @@ func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid collection", http.StatusBadRequest, err))
 		return
 	}
-	fileUrl := r.Context().Value("fileUrl").(string)
+	filename := r.Context().Value("filename").(string)
 	switch vars["collection"] {
 	case "tasks":
 		log.Println("Upload file for task with id:", id)
@@ -47,7 +49,10 @@ func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(errorApp)
 			return
 		}
-		task.Image = fileUrl
+		if task.Image != "" {
+			storeProvider.DeleteFile(task.Image)
+		}
+		task.Image, _ = storeProvider.SaveFile(filename)
 		errorApp = TaskService.SaveTask(&task)
 		if errorApp.StatusCode != 0 {
 			w.WriteHeader(errorApp.StatusCode)
@@ -63,7 +68,10 @@ func (f *FilesHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(errorApp)
 			return
 		}
-		user.Image = fileUrl
+		if user.Image != "" {
+			storeProvider.DeleteFile(user.Image)
+		}
+		user.Image, _ = storeProvider.SaveFile(filename)
 		errorApp = userService.SaveUser(&user)
 		if errorApp.StatusCode != 0 {
 			w.WriteHeader(errorApp.StatusCode)

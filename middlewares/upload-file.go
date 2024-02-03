@@ -48,10 +48,9 @@ func UploadFile(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode(error.New("Error copying the file", http.StatusInternalServerError, err))
 			return
 		}
-		log.Println("http://" + r.Host + "/uploads/" + handler.Filename)
 		// se crea la url del archivo
-		fileUrl := "http://" + r.Host + "/uploads/" + handler.Filename
-		ctx := context.WithValue(r.Context(), "fileUrl", fileUrl)
+		log.Println("filename ", handler.Filename)
+		ctx := context.WithValue(r.Context(), "filename", handler.Filename)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
