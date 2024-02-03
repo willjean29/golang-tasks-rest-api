@@ -25,6 +25,7 @@ type UserJSON struct {
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	Tasks     []Task         `json:"tasks"`
 }
 
 func (u *User) MarshalJSON() ([]byte, error) {
@@ -37,6 +38,9 @@ func (u *User) MarshalJSON() ([]byte, error) {
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		DeletedAt: u.DeletedAt,
+		Tasks:     u.Tasks,
 	}
 	return json.Marshal(userJSON)
 }
+
+type ListUsers []User

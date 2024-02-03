@@ -12,7 +12,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var userValidator validators.UserValidator = validators.NewUserValidator()
@@ -111,5 +114,36 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(24 * time.Hour), // Ajusta la duración de la cookie según tus necesidades
 	})
 	userJson, _ := newUser.MarshalJSON()
+	w.Write(userJson)
+}
+
+func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	users, errorApp := userService.GetUsers()
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
+		return
+	}
+
+	json.NewEncoder(w).Encode(users)
+}
+
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
+		return
+	}
+
+	user, errorApp := userService.GetUser(id)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
+		return
+	}
+
+	userJson, _ := user.MarshalJSON()
 	w.Write(userJson)
 }
