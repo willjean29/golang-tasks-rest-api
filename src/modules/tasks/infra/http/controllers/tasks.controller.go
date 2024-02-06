@@ -6,6 +6,7 @@ import (
 
 	usecases "app/src/modules/tasks/app"
 	"app/src/modules/tasks/domain/models"
+	"app/src/modules/tasks/domain/validators"
 	"app/src/modules/tasks/infra/gorm/repositories"
 	"app/utils"
 	"encoding/json"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+var taskValidator validators.TaskValidator = validators.NewTaskValidator()
 
 type TasksController struct{}
 
@@ -76,7 +79,12 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 			Repository: db.DB,
 		},
 	}
-
+	err = taskValidator.ValidateCreateTask(createTask)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
+		return
+	}
 	task, errorApp := usecase.Execute(createTask)
 
 	if errorApp.StatusCode != 0 {
@@ -132,6 +140,12 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Please enter valid data", http.StatusBadRequest, err))
+		return
+	}
+	err = taskValidator.ValidateUpdateTask(updateTask)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
 	usecase := usecases.UpdateTaskUseCase{
