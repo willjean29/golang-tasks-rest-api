@@ -8,5 +8,5 @@ type ITaskRepository interface {
 	Create(task models.ICreateTask) (models.ITask, error)
 	// Save(task models.ITask) error
 	// Update(task models.IUpdateTask) (models.ITask, error)
-	// Delete(id int) error
+	Delete(id int) error
 }

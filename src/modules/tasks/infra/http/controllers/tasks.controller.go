@@ -83,3 +83,31 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(task)
 }
+
+func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskID, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors.New("Invalid ID"))
+		return
+	}
+	usecase := usecases.DeleteTaskUseCase{
+		TaskRepository: &repositories.TasksRepository{
+			Repository: db.DB,
+		},
+	}
+
+	err = usecase.Execute(taskID)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "The task with ID " + strconv.Itoa(taskID) + " has been remove successfully",
+	})
+
+}

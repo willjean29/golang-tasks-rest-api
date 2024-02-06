@@ -91,3 +91,19 @@ func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, e
 	}
 	return taskModel, nil
 }
+
+func (t *TasksRepository) Delete(id int) error {
+	var task entities.Task
+	query := t.Repository.Delete(&task, id)
+	err := query.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("Task not found")
+		} else {
+			return errors.New("Error delete task")
+		}
+	}
+
+	return nil
+}
