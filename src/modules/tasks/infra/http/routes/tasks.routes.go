@@ -12,4 +12,5 @@ func TaskRoutes(router *mux.Router) {
 	taskRouter := router.PathPrefix("/tareas").Subrouter()
 
 	taskRouter.HandleFunc("", tasksController.List).Methods(http.MethodGet)
+	taskRouter.HandleFunc("/{id}", tasksController.Show).Methods(http.MethodGet)
 }

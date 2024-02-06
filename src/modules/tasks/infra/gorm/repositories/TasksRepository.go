@@ -40,3 +40,30 @@ func (t *TasksRepository) FindAll() (models.IListTask, error) {
 	}
 	return listTask, nil
 }
+
+func (t *TasksRepository) FindById(id int) (models.ITask, error) {
+
+	var task entities.Task
+
+	query := t.Repository.First(&task, id)
+	err := query.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.ITask{}, errors.New("Data of task not found")
+		} else {
+			return models.ITask{}, errors.New("Error get task")
+		}
+	}
+
+	taskModel := models.ITask{
+		ID:        task.ID,
+		Name:      task.Name,
+		Content:   task.Content,
+		Image:     task.Image,
+		CreatedAt: task.CreatedAt,
+		UpdatedAt: task.UpdatedAt,
+	}
+
+	return taskModel, nil
+}
