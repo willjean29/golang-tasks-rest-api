@@ -109,5 +109,41 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "The task with ID " + strconv.Itoa(taskID) + " has been remove successfully",
 	})
+}
 
+func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskID, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors.New("Invalid ID"))
+		return
+	}
+	var updateTask models.IUpdateTask
+
+	err = utils.TransformBody(r.Body, &updateTask)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors.New("Please enter valid data"))
+		return
+	}
+	usecase := usecases.UpdateTaskUseCase{
+		TaskRepository: &repositories.TasksRepository{
+			Repository: db.DB,
+		},
+	}
+
+	_, err = usecase.Execute(updateTask, taskID)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "The task with ID " + strconv.Itoa(taskID) + " has been update successfully",
+	})
 }

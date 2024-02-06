@@ -107,3 +107,33 @@ func (t *TasksRepository) Delete(id int) error {
 
 	return nil
 }
+
+func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.ITask, error) {
+	task := entities.Task{
+		Name:    updateTask.Name,
+		Content: updateTask.Content,
+	}
+
+	query := t.Repository.Where("id = ?", id).Updates(&task)
+	err := query.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.ITask{}, errors.New("Task not found")
+		} else {
+			return models.ITask{}, errors.New("Error update task")
+		}
+	}
+	if query.RowsAffected == 0 {
+		return models.ITask{}, errors.New("No task was updated")
+	}
+	taskModel := models.ITask{
+		ID:        task.ID,
+		Name:      task.Name,
+		Content:   task.Content,
+		Image:     task.Image,
+		CreatedAt: task.CreatedAt,
+		UpdatedAt: task.UpdatedAt,
+	}
+	return taskModel, nil
+}
