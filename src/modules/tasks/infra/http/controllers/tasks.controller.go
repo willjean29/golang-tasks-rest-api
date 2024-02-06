@@ -3,7 +3,9 @@ package controllers
 import (
 	"app/db"
 	usecases "app/src/modules/tasks/app"
+	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/gorm/repositories"
+	"app/utils"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -54,4 +56,30 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tasks)
+}
+
+func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
+	var createTask models.ICreateTask
+
+	err := utils.TransformBody(r.Body, &createTask)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors.New("Invalid data"))
+		return
+	}
+	usecase := usecases.CreateTaskUseCase{
+		TaskRepository: &repositories.TasksRepository{
+			Repository: db.DB,
+		},
+	}
+
+	task, err := usecase.Execute(createTask)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(task)
 }

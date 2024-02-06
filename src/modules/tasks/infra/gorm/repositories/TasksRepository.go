@@ -67,3 +67,27 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error) {
 
 	return taskModel, nil
 }
+
+func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, error) {
+	task := entities.Task{
+		Name:    createTask.Name,
+		Content: createTask.Content,
+		UserID:  4,
+	}
+
+	query := t.Repository.Create(&task)
+	err := query.Error
+
+	if err != nil {
+		return models.ITask{}, errors.New("Error create task")
+	}
+	taskModel := models.ITask{
+		ID:        task.ID,
+		Name:      task.Name,
+		Content:   task.Content,
+		Image:     task.Image,
+		CreatedAt: task.CreatedAt,
+		UpdatedAt: task.UpdatedAt,
+	}
+	return taskModel, nil
+}
