@@ -3,6 +3,7 @@ package repositories
 import (
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/gorm/entities"
+	error "app/src/shared/errors"
 	"errors"
 
 	"gorm.io/gorm"
@@ -12,7 +13,7 @@ type TasksRepository struct {
 	Repository *gorm.DB
 }
 
-func (t *TasksRepository) FindAll() (models.IListTask, error) {
+func (t *TasksRepository) FindAll() (models.IListTask, error.Error) {
 	var listTask models.IListTask
 	var list entities.ListTask
 
@@ -21,9 +22,9 @@ func (t *TasksRepository) FindAll() (models.IListTask, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.IListTask{}, errors.New("Data of tasks not found")
+			return models.IListTask{}, *error.New("Data of tasks not found", 404, errors.New(err.Error()))
 		} else {
-			return models.IListTask{}, errors.New("Error get list task")
+			return models.IListTask{}, *error.New("Error get list task", 500, errors.New(err.Error()))
 		}
 	}
 
@@ -38,10 +39,10 @@ func (t *TasksRepository) FindAll() (models.IListTask, error) {
 		}
 		listTask = append(listTask, task)
 	}
-	return listTask, nil
+	return listTask, error.Error{}
 }
 
-func (t *TasksRepository) FindById(id int) (models.ITask, error) {
+func (t *TasksRepository) FindById(id int) (models.ITask, error.Error) {
 
 	var task entities.Task
 
@@ -50,9 +51,9 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.ITask{}, errors.New("Data of task not found")
+			return models.ITask{}, *error.New("Task not found", 404, errors.New(err.Error()))
 		} else {
-			return models.ITask{}, errors.New("Error get task")
+			return models.ITask{}, *error.New("Error get task", 500, errors.New(err.Error()))
 		}
 	}
 
@@ -65,10 +66,10 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error) {
 		UpdatedAt: task.UpdatedAt,
 	}
 
-	return taskModel, nil
+	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, error) {
+func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, error.Error) {
 	task := entities.Task{
 		Name:    createTask.Name,
 		Content: createTask.Content,
@@ -79,7 +80,11 @@ func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, e
 	err := query.Error
 
 	if err != nil {
-		return models.ITask{}, errors.New("Error create task")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.ITask{}, *error.New("Task not created", 400, errors.New(err.Error()))
+		} else {
+			return models.ITask{}, *error.New("Error create task", 500, errors.New(err.Error()))
+		}
 	}
 	taskModel := models.ITask{
 		ID:        task.ID,
@@ -89,26 +94,30 @@ func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, e
 		CreatedAt: task.CreatedAt,
 		UpdatedAt: task.UpdatedAt,
 	}
-	return taskModel, nil
+	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Delete(id int) error {
+func (t *TasksRepository) Delete(id int) error.Error {
 	var task entities.Task
 	query := t.Repository.Delete(&task, id)
 	err := query.Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("Task not found")
+			return *error.New("Task not found", 404, errors.New(err.Error()))
 		} else {
-			return errors.New("Error delete task")
+			return *error.New("Error delete task", 500, errors.New(err.Error()))
 		}
 	}
 
-	return nil
+	if query.RowsAffected == 0 {
+		return *error.New("Task not found", 404, errors.New("No task was updated"))
+	}
+
+	return error.Error{}
 }
 
-func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.ITask, error) {
+func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.ITask, error.Error) {
 	task := entities.Task{
 		Name:    updateTask.Name,
 		Content: updateTask.Content,
@@ -119,13 +128,13 @@ func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.ITask{}, errors.New("Task not found")
+			return models.ITask{}, *error.New("Task not found", 404, errors.New(err.Error()))
 		} else {
-			return models.ITask{}, errors.New("Error update task")
+			return models.ITask{}, *error.New("Error update task", 500, errors.New(err.Error()))
 		}
 	}
 	if query.RowsAffected == 0 {
-		return models.ITask{}, errors.New("No task was updated")
+		return models.ITask{}, *error.New("Task not found", 404, errors.New("No task was updated"))
 	}
 	taskModel := models.ITask{
 		ID:        task.ID,
@@ -135,5 +144,5 @@ func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.
 		CreatedAt: task.CreatedAt,
 		UpdatedAt: task.UpdatedAt,
 	}
-	return taskModel, nil
+	return taskModel, error.Error{}
 }

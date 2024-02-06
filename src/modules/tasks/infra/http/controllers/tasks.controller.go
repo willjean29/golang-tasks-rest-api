@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"app/db"
+	error "app/src/shared/errors"
+
 	usecases "app/src/modules/tasks/app"
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/gorm/repositories"
 	"app/utils"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -24,10 +25,11 @@ func (t *TasksController) List(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	tasks, err := usecase.Execute()
+	tasks, errorApp := usecase.Execute()
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -39,7 +41,7 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 	taskID, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.New("Invalid ID"))
+		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
 	usecase := usecases.GetTaskUseCase{
@@ -48,10 +50,11 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	tasks, err := usecase.Execute(taskID)
+	tasks, errorApp := usecase.Execute(taskID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -65,7 +68,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.New("Invalid data"))
+		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
 	usecase := usecases.CreateTaskUseCase{
@@ -74,10 +77,11 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	task, err := usecase.Execute(createTask)
+	task, errorApp := usecase.Execute(createTask)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -90,7 +94,7 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.New("Invalid ID"))
+		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
 	usecase := usecases.DeleteTaskUseCase{
@@ -99,10 +103,11 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	err = usecase.Execute(taskID)
+	errorApp := usecase.Execute(taskID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -117,7 +122,7 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.New("Invalid ID"))
+		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
 	var updateTask models.IUpdateTask
@@ -126,7 +131,7 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(errors.New("Please enter valid data"))
+		json.NewEncoder(w).Encode(error.New("Please enter valid data", http.StatusBadRequest, err))
 		return
 	}
 	usecase := usecases.UpdateTaskUseCase{
@@ -135,10 +140,11 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	_, err = usecase.Execute(updateTask, taskID)
+	_, errorApp := usecase.Execute(updateTask, taskID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
