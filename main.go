@@ -7,6 +7,8 @@ import (
 	"app/models"
 	"app/routes"
 	taskRoutes "app/src/modules/tasks/infra/http/routes"
+	userRoutes "app/src/modules/users/infra/http/routes"
+
 	"encoding/json"
 	"errors"
 	"log"
@@ -44,6 +46,7 @@ func main() {
 	routes.FilesRoutes(router)
 	routes.UserRoutes(router)
 	taskRoutes.TaskRoutes(router)
+	userRoutes.UserRoutes(router)
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(error.New("Endpoint not found", http.StatusNotFound, errors.New("Not found - "+r.URL.Path)))
