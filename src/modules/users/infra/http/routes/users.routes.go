@@ -17,5 +17,5 @@ func UserRoutes(router *mux.Router) {
 	// taskRouter.HandleFunc("/{id}", tasksController.Update).Methods(http.MethodPut)
 	// taskRouter.HandleFunc("/{id}", tasksController.Delete).Methods(http.MethodDelete)
 	userRouter.HandleFunc("/login", usersController.Login).Methods(http.MethodPost)
-
+	userRouter.HandleFunc("/register", usersController.Register).Methods(http.MethodPost)
 }

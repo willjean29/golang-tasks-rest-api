@@ -2,22 +2,18 @@ package controllers
 
 import (
 	"app/db"
-	token "app/providers/TokenProvider"
 	usecases "app/src/modules/users/app"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/infra/gorm/repositories"
 	error "app/src/shared/errors"
 	"app/utils"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
 )
-
-var tokenProvider token.TokenProvider = token.NewJwtProvider()
 
 type UsersController struct{}
 
@@ -78,26 +74,52 @@ func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	user, errorApp := usecase.Execute(createSession)
+	user, token, errorApp := usecase.Execute(createSession)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
-	tokenString, err := tokenProvider.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   token,
+		Expires: time.Now().Add(24 * time.Hour), // Ajusta la duración de la cookie según tus necesidades
+	})
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
+func (u *UsersController) Register(w http.ResponseWriter, r *http.Request) {
+	var createUser models.ICreateUser
+
+	err := utils.TransformBody(r.Body, &createUser)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(error.New("Internal server error", http.StatusInternalServerError, err))
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
+		return
+	}
+
+	usecase := usecases.CreateUserUseCase{
+		UserRepository: &repositories.UsersRepository{
+			Repository: db.DB,
+		},
+	}
+
+	user, token, errorApp := usecase.Execute(createUser)
+	if errorApp.StatusCode != 0 {
+		w.WriteHeader(errorApp.StatusCode)
+		json.NewEncoder(w).Encode(errorApp)
 		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
-		Value:   tokenString,
+		Value:   token,
 		Expires: time.Now().Add(24 * time.Hour), // Ajusta la duración de la cookie según tus necesidades
 	})
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(user)
 }

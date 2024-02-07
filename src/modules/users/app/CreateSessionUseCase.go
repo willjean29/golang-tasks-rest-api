@@ -6,6 +6,7 @@ import (
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/domain/repositories"
 	error "app/src/shared/errors"
+	"fmt"
 )
 
 var hashProvider hash.HashProvider = &hash.BcryptProvider{}
@@ -15,14 +16,18 @@ type CreateSessionUseCase struct {
 	UserRepository repositories.IUserRepository
 }
 
-func (c *CreateSessionUseCase) Execute(createSession models.ICreateSession) (models.IUser, error.Error) {
+func (c *CreateSessionUseCase) Execute(createSession models.ICreateSession) (models.IUser, string, error.Error) {
 	user, errorApp := c.UserRepository.FindByEmail(createSession.Email)
 	if errorApp.StatusCode != 0 {
-		return models.IUser{}, errorApp
+		return models.IUser{}, "", errorApp
 	}
 	err := hashProvider.ComparePasswords(user.Password, createSession.Password)
 	if err != nil {
-		return models.IUser{}, *error.New("Invalid data (password)", 401, err)
+		return models.IUser{}, "", *error.New("Invalid data (password)", 401, err)
 	}
-	return user, error.Error{}
+	tokenString, err := tokenProvider.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
+	if err != nil {
+		return models.IUser{}, "", *error.New("Internal server error", 500, err)
+	}
+	return user, tokenString, error.Error{}
 }

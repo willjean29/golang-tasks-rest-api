@@ -72,3 +72,27 @@ func (u *UsersRepository) FindByEmail(email string) (models.IUser, error.Error) 
 	userModel = utils.MapperToUser(user)
 	return userModel, error.Error{}
 }
+
+func (u *UsersRepository) Create(createUser models.ICreateUser) (models.IUser, error.Error) {
+	user := entities.User{
+		Name:     createUser.Name,
+		Email:    createUser.Email,
+		Password: createUser.Password,
+	}
+
+	query := u.Repository.Create(&user)
+	if query.RowsAffected == 0 {
+		return models.IUser{}, *error.New("User not created", 400, errors.New("User not created"))
+	}
+
+	err := query.Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.IUser{}, *error.New("User not created", 400, errors.New(err.Error()))
+		} else {
+			return models.IUser{}, *error.New("Error create user", 500, errors.New(err.Error()))
+		}
+	}
+	userModel := utils.MapperToUser(user)
+	return userModel, error.Error{}
+}
