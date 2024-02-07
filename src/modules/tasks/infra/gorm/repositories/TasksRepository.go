@@ -3,6 +3,7 @@ package repositories
 import (
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/gorm/entities"
+	"app/src/modules/tasks/infra/utils"
 	error "app/src/shared/errors"
 	"errors"
 
@@ -28,17 +29,7 @@ func (t *TasksRepository) FindAll() (models.IListTask, error.Error) {
 		}
 	}
 
-	for _, value := range list {
-		task := models.ITask{
-			ID:        value.ID,
-			Name:      value.Name,
-			Content:   value.Content,
-			Image:     value.Image,
-			CreatedAt: value.CreatedAt,
-			UpdatedAt: value.UpdatedAt,
-		}
-		listTask = append(listTask, task)
-	}
+	listTask = utils.MapperToTasks(list)
 	return listTask, error.Error{}
 }
 
@@ -57,14 +48,7 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error.Error) {
 		}
 	}
 
-	taskModel := models.ITask{
-		ID:        task.ID,
-		Name:      task.Name,
-		Content:   task.Content,
-		Image:     task.Image,
-		CreatedAt: task.CreatedAt,
-		UpdatedAt: task.UpdatedAt,
-	}
+	taskModel := utils.MapperToTask(task)
 
 	return taskModel, error.Error{}
 }
@@ -86,14 +70,7 @@ func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, e
 			return models.ITask{}, *error.New("Error create task", 500, errors.New(err.Error()))
 		}
 	}
-	taskModel := models.ITask{
-		ID:        task.ID,
-		Name:      task.Name,
-		Content:   task.Content,
-		Image:     task.Image,
-		CreatedAt: task.CreatedAt,
-		UpdatedAt: task.UpdatedAt,
-	}
+	taskModel := utils.MapperToTask(task)
 	return taskModel, error.Error{}
 }
 
@@ -136,13 +113,6 @@ func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.
 	if query.RowsAffected == 0 {
 		return models.ITask{}, *error.New("Task not found", 404, errors.New("No task was updated"))
 	}
-	taskModel := models.ITask{
-		ID:        task.ID,
-		Name:      task.Name,
-		Content:   task.Content,
-		Image:     task.Image,
-		CreatedAt: task.CreatedAt,
-		UpdatedAt: task.UpdatedAt,
-	}
+	taskModel := utils.MapperToTask(task)
 	return taskModel, error.Error{}
 }
