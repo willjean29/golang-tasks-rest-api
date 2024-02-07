@@ -5,6 +5,7 @@ import (
 	usecases "app/src/modules/users/app"
 	"app/src/modules/users/infra/gorm/repositories"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -24,5 +25,6 @@ func (u *UsersController) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	log.Println("users:", users)
 	json.NewEncoder(w).Encode(users)
 }
