@@ -18,6 +18,7 @@ func MapperToUser(user entities.User) models.IUser {
 		Name:      user.Name,
 		Email:     user.Email,
 		Password:  user.Password,
+		Image:     user.Image,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Tasks:     tasks,
