@@ -4,6 +4,7 @@ import (
 	"app/db"
 	usecases "app/src/modules/users/app"
 	"app/src/modules/users/domain/models"
+	"app/src/modules/users/domain/validators"
 	"app/src/modules/users/infra/gorm/repositories"
 	error "app/src/shared/errors"
 	"app/utils"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+var userValidator validators.UserValidator = validators.NewUserValidator()
 
 type UsersController struct{}
 
@@ -64,10 +67,15 @@ func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
 	err := utils.TransformBody(r.Body, &createSession)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
+		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
 		return
 	}
-
+	err = userValidator.ValidateLogin(createSession)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
+		return
+	}
 	usecase := usecases.CreateSessionUseCase{
 		UserRepository: &repositories.UsersRepository{
 			Repository: db.DB,
@@ -97,10 +105,16 @@ func (u *UsersController) Register(w http.ResponseWriter, r *http.Request) {
 	err := utils.TransformBody(r.Body, &createUser)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
+		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
 		return
 	}
 
+	err = userValidator.ValidateCreateUser(createUser)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
+		return
+	}
 	usecase := usecases.CreateUserUseCase{
 		UserRepository: &repositories.UsersRepository{
 			Repository: db.DB,
