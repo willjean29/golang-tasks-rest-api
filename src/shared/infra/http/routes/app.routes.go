@@ -8,6 +8,7 @@ import (
 )
 
 func Routes(router *mux.Router) {
-	taskRoutes.TaskRoutes(router)
-	userRoutes.UserRoutes(router)
+	apiRouter := router.PathPrefix("/api").Subrouter()
+	taskRoutes.TaskRoutes(apiRouter)
+	userRoutes.UserRoutes(apiRouter)
 }
