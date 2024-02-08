@@ -2,10 +2,10 @@ package server
 
 import (
 	"app/db"
-	"app/middlewares"
 	taskModels "app/src/modules/tasks/infra/gorm/entities"
 	userModels "app/src/modules/users/infra/gorm/entities"
 	error "app/src/shared/errors"
+	"app/src/shared/infra/http/middlewares"
 	"app/src/shared/infra/http/routes"
 	"encoding/json"
 	"errors"
