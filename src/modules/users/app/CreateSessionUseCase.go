@@ -1,16 +1,16 @@
 package usecases
 
 import (
-	hash "app/providers/HashProvider"
-	token "app/providers/TokenProvider"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/domain/repositories"
+	hash "app/src/shared/adapters/hash"
+	token "app/src/shared/adapters/token"
 	error "app/src/shared/errors"
 	"fmt"
 )
 
-var hashProvider hash.HashProvider = &hash.BcryptProvider{}
-var tokenProvider token.TokenProvider = token.NewJwtProvider()
+var hashAdapter hash.HashAdapter = &hash.BcryptAdapter{}
+var tokenAdapter token.TokenAdapter = token.NewJwtAdapter()
 
 type CreateSessionUseCase struct {
 	UserRepository repositories.IUserRepository
@@ -21,11 +21,11 @@ func (c *CreateSessionUseCase) Execute(createSession models.ICreateSession) (mod
 	if errorApp.StatusCode != 0 {
 		return models.IUser{}, "", errorApp
 	}
-	err := hashProvider.ComparePasswords(user.Password, createSession.Password)
+	err := hashAdapter.ComparePasswords(user.Password, createSession.Password)
 	if err != nil {
 		return models.IUser{}, "", *error.New("Invalid data (password)", 401, err)
 	}
-	tokenString, err := tokenProvider.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
+	tokenString, err := tokenAdapter.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
 	if err != nil {
 		return models.IUser{}, "", *error.New("Internal server error", 500, err)
 	}

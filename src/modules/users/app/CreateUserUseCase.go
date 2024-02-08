@@ -12,7 +12,7 @@ type CreateUserUseCase struct {
 }
 
 func (c *CreateUserUseCase) Execute(createUser models.ICreateUser) (models.IUser, string, error.Error) {
-	hashPassword, err := hashProvider.HashPassword(createUser.Password)
+	hashPassword, err := hashAdapter.HashPassword(createUser.Password)
 	if err != nil {
 		return models.IUser{}, "", *error.New("Internal server error", 500, err)
 	}
@@ -23,7 +23,7 @@ func (c *CreateUserUseCase) Execute(createUser models.ICreateUser) (models.IUser
 		return models.IUser{}, "", errorApp
 	}
 
-	tokenString, err := tokenProvider.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
+	tokenString, err := tokenAdapter.GenerateToken("userId", fmt.Sprintf("%d", user.ID))
 	if err != nil {
 		return models.IUser{}, "", *error.New("Internal server error", 500, err)
 	}
