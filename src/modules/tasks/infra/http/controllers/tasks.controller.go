@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"app/db"
 	error "app/src/shared/errors"
+	db "app/src/shared/infra/gorm"
 
 	usecases "app/src/modules/tasks/app"
 	"app/src/modules/tasks/domain/models"

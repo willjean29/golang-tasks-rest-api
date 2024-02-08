@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"app/db"
 	usecases "app/src/modules/users/app"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/domain/validators"
 	"app/src/modules/users/infra/gorm/repositories"
 	error "app/src/shared/errors"
+	db "app/src/shared/infra/gorm"
 	"app/utils"
 	"encoding/json"
 	"net/http"
