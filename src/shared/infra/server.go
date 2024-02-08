@@ -61,7 +61,6 @@ func (s *Server) Routes() {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(error.New("Endpoint not found", http.StatusNotFound, errors.New("Not found - "+r.URL.Path)))
 	})
-
 }
 
 func (s *Server) Middlewares() {

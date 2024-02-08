@@ -21,14 +21,14 @@ var taskValidator validators.TaskValidator = validators.NewTaskValidator()
 type TasksController struct{}
 
 func (t *TasksController) List(w http.ResponseWriter, r *http.Request) {
-
+	userId := r.Context().Value("userId").(int)
 	usecase := usecases.ListTasksUseCase{
 		TaskRepository: &repositories.TasksRepository{
 			Repository: db.DB,
 		},
 	}
 
-	tasks, errorApp := usecase.Execute()
+	tasks, errorApp := usecase.Execute(uint(userId))
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
@@ -68,7 +68,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 	var createTask models.ICreateTask
 
 	err := utils.TransformBody(r.Body, &createTask)
-
+	userId := r.Context().Value("userId").(int)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
@@ -85,7 +85,8 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-	task, errorApp := usecase.Execute(createTask)
+
+	task, errorApp := usecase.Execute(createTask, uint(userId))
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)

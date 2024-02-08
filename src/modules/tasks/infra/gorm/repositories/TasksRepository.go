@@ -14,11 +14,11 @@ type TasksRepository struct {
 	Repository *gorm.DB
 }
 
-func (t *TasksRepository) FindAll() (models.IListTask, error.Error) {
+func (t *TasksRepository) FindAll(userId uint) (models.IListTask, error.Error) {
 	var listTask models.IListTask
 	var list entities.ListTask
 
-	query := t.Repository.Find(&list)
+	query := t.Repository.Where("user_id = ?", userId).Find(&list)
 	err := query.Error
 
 	if err != nil {
@@ -53,11 +53,11 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error.Error) {
 	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Create(createTask models.ICreateTask) (models.ITask, error.Error) {
+func (t *TasksRepository) Create(createTask models.ICreateTask, userId uint) (models.ITask, error.Error) {
 	task := entities.Task{
 		Name:    createTask.Name,
 		Content: createTask.Content,
-		UserID:  4,
+		UserID:  userId,
 	}
 
 	query := t.Repository.Create(&task)

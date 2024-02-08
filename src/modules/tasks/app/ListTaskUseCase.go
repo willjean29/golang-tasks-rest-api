@@ -10,8 +10,8 @@ type ListTasksUseCase struct {
 	TaskRepository repositories.ITaskRepository
 }
 
-func (l *ListTasksUseCase) Execute() (models.IListTask, error.Error) {
-	tasks, err := l.TaskRepository.FindAll()
+func (l *ListTasksUseCase) Execute(userId uint) (models.IListTask, error.Error) {
+	tasks, err := l.TaskRepository.FindAll(userId)
 	if err.StatusCode != 0 {
 		return models.IListTask{}, err
 	}

@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"app/error"
 	token "app/providers/TokenProvider"
+	error "app/src/shared/errors"
 	"context"
 	"encoding/json"
 	"net/http"

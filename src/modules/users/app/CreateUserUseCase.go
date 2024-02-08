@@ -12,6 +12,12 @@ type CreateUserUseCase struct {
 }
 
 func (c *CreateUserUseCase) Execute(createUser models.ICreateUser) (models.IUser, string, error.Error) {
+	hashPassword, err := hashProvider.HashPassword(createUser.Password)
+	if err != nil {
+		return models.IUser{}, "", *error.New("Internal server error", 500, err)
+	}
+	createUser.Password = hashPassword
+
 	user, errorApp := c.UserRepository.Create(createUser)
 	if errorApp.StatusCode != 0 {
 		return models.IUser{}, "", errorApp

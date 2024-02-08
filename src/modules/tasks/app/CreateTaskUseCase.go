@@ -10,8 +10,8 @@ type CreateTaskUseCase struct {
 	TaskRepository repositories.ITaskRepository
 }
 
-func (l *CreateTaskUseCase) Execute(createProduct models.ICreateTask) (models.ITask, error.Error) {
-	tasks, err := l.TaskRepository.Create(createProduct)
+func (l *CreateTaskUseCase) Execute(createProduct models.ICreateTask, userId uint) (models.ITask, error.Error) {
+	tasks, err := l.TaskRepository.Create(createProduct, userId)
 	if err.StatusCode != 0 {
 		return models.ITask{}, err
 	}
