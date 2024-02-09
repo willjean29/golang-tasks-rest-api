@@ -4,7 +4,7 @@ import (
 	taskModels "app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/data/gorm/utils"
 	"app/src/modules/users/domain/models"
-	"app/src/modules/users/infra/gorm/entities"
+	"app/src/modules/users/infra/data/gorm/entities"
 )
 
 func MapperToUserEntity(mapper models.IUser) entities.User {
