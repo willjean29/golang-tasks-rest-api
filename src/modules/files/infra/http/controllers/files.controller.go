@@ -2,7 +2,8 @@ package controllers
 
 import (
 	taskUsecases "app/src/modules/tasks/app"
-	taskRepository "app/src/modules/tasks/infra/gorm/repositories"
+	"app/src/modules/tasks/infra/datasource"
+	taskRepositories "app/src/modules/tasks/infra/repositories"
 	userUsecases "app/src/modules/users/app"
 	userRepository "app/src/modules/users/infra/gorm/repositories"
 	store "app/src/shared/adapters/storage"
@@ -18,6 +19,9 @@ import (
 
 var collections = []string{"tasks", "users"}
 var storeAdapter store.StoreAdapter = &store.DiskAdapter{}
+var taskRepository = &taskRepositories.TasksRepository{
+	Datasource: &datasource.GormTaskDatasource{},
+}
 
 type FilesController struct{}
 
@@ -69,9 +73,7 @@ func (f *FilesController) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 func uploadFileTask(taskId int, filename string) (map[string]string, error.Error) {
 	getTaskUseCase := taskUsecases.GetTaskUseCase{
-		TaskRepository: &taskRepository.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 	task, errorApp := getTaskUseCase.Execute(taskId)
 	if errorApp.StatusCode != 0 {
@@ -83,9 +85,7 @@ func uploadFileTask(taskId int, filename string) (map[string]string, error.Error
 
 	task.Image, _ = storeAdapter.SaveFile(filename)
 	saveTask := taskUsecases.SaveTaskUseCase{
-		TaskRepository: &taskRepository.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 	errorApp = saveTask.Execute(task)
 	if errorApp.StatusCode != 0 {

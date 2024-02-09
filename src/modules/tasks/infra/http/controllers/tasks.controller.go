@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	error "app/src/shared/errors"
-	db "app/src/shared/infra/gorm"
-
 	usecases "app/src/modules/tasks/app"
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/domain/validators"
-	"app/src/modules/tasks/infra/gorm/repositories"
+	"app/src/modules/tasks/infra/datasource"
+	"app/src/modules/tasks/infra/repositories"
+	error "app/src/shared/errors"
+
 	"app/src/shared/utils"
 	"encoding/json"
 	"net/http"
@@ -17,15 +17,16 @@ import (
 )
 
 var taskValidator validators.TaskValidator = validators.NewTaskValidator()
+var taskRepository = &repositories.TasksRepository{
+	Datasource: &datasource.GormTaskDatasource{},
+}
 
 type TasksController struct{}
 
 func (t *TasksController) List(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userId").(int)
 	usecase := usecases.ListTasksUseCase{
-		TaskRepository: &repositories.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 
 	tasks, errorApp := usecase.Execute(uint(userId))
@@ -48,9 +49,7 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.GetTaskUseCase{
-		TaskRepository: &repositories.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 
 	tasks, errorApp := usecase.Execute(taskID)
@@ -75,9 +74,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.CreateTaskUseCase{
-		TaskRepository: &repositories.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 	err = taskValidator.ValidateCreateTask(createTask)
 	if err != nil {
@@ -107,9 +104,7 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.DeleteTaskUseCase{
-		TaskRepository: &repositories.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 
 	errorApp := usecase.Execute(taskID)
@@ -150,9 +145,7 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.UpdateTaskUseCase{
-		TaskRepository: &repositories.TasksRepository{
-			Repository: db.DB,
-		},
+		TaskRepository: taskRepository,
 	}
 
 	_, errorApp := usecase.Execute(updateTask, taskID)

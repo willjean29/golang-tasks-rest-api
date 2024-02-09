@@ -1,24 +1,23 @@
-package repositories
+package datasource
 
 import (
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/gorm/entities"
 	"app/src/modules/tasks/infra/utils"
 	error "app/src/shared/errors"
+	db "app/src/shared/infra/gorm"
 	"errors"
 
 	"gorm.io/gorm"
 )
 
-type TasksRepository struct {
-	Repository *gorm.DB
-}
+type GormTaskDatasource struct{}
 
-func (t *TasksRepository) FindAll(userId uint) (models.IListTask, error.Error) {
+func (g *GormTaskDatasource) FindAll(userId uint) (models.IListTask, error.Error) {
 	var listTask models.IListTask
 	var list entities.ListTask
 
-	query := t.Repository.Where("user_id = ?", userId).Find(&list)
+	query := db.DB.Where("user_id = ?", userId).Find(&list)
 	err := query.Error
 
 	if err != nil {
@@ -33,11 +32,11 @@ func (t *TasksRepository) FindAll(userId uint) (models.IListTask, error.Error) {
 	return listTask, error.Error{}
 }
 
-func (t *TasksRepository) FindById(id int) (models.ITask, error.Error) {
+func (g *GormTaskDatasource) FindById(id int) (models.ITask, error.Error) {
 
 	var task entities.Task
 
-	query := t.Repository.First(&task, id)
+	query := db.DB.First(&task, id)
 	err := query.Error
 
 	if err != nil {
@@ -53,14 +52,14 @@ func (t *TasksRepository) FindById(id int) (models.ITask, error.Error) {
 	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Create(createTask models.ICreateTask, userId uint) (models.ITask, error.Error) {
+func (g *GormTaskDatasource) Create(createTask models.ICreateTask, userId uint) (models.ITask, error.Error) {
 	task := entities.Task{
 		Name:    createTask.Name,
 		Content: createTask.Content,
 		UserID:  userId,
 	}
 
-	query := t.Repository.Create(&task)
+	query := db.DB.Create(&task)
 	err := query.Error
 
 	if err != nil {
@@ -74,9 +73,9 @@ func (t *TasksRepository) Create(createTask models.ICreateTask, userId uint) (mo
 	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Delete(id int) error.Error {
+func (g *GormTaskDatasource) Delete(id int) error.Error {
 	var task entities.Task
-	query := t.Repository.Delete(&task, id)
+	query := db.DB.Delete(&task, id)
 	err := query.Error
 
 	if err != nil {
@@ -94,13 +93,13 @@ func (t *TasksRepository) Delete(id int) error.Error {
 	return error.Error{}
 }
 
-func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.ITask, error.Error) {
+func (g *GormTaskDatasource) Update(updateTask models.IUpdateTask, id int) (models.ITask, error.Error) {
 	task := entities.Task{
 		Name:    updateTask.Name,
 		Content: updateTask.Content,
 	}
 
-	query := t.Repository.Where("id = ?", id).Updates(&task)
+	query := db.DB.Where("id = ?", id).Updates(&task)
 	err := query.Error
 
 	if err != nil {
@@ -117,9 +116,9 @@ func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.
 	return taskModel, error.Error{}
 }
 
-func (t *TasksRepository) Save(task models.ITask) error.Error {
+func (g *GormTaskDatasource) Save(task models.ITask) error.Error {
 	taskEntity := utils.MapperToTaskEntity(task)
-	query := t.Repository.Where("id = ?", task.ID).Updates(&taskEntity)
+	query := db.DB.Where("id = ?", task.ID).Updates(&taskEntity)
 	err := query.Error
 	if query.RowsAffected == 0 {
 		return *error.New("Task not created", 400, errors.New("Task not created"))
