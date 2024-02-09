@@ -1,6 +1,8 @@
 package db
 
 import (
+	taskModels "app/src/modules/tasks/infra/data/gorm/entities"
+	userModels "app/src/modules/users/infra/data/gorm/entities"
 	"log"
 
 	"gorm.io/driver/postgres"
@@ -18,4 +20,9 @@ func GormConnection() {
 	} else {
 		log.Println("Database connected successfully")
 	}
+}
+
+func GormSyncDatabase() {
+	GormConnection()
+	DB.AutoMigrate(&taskModels.Task{}, &userModels.User{})
 }

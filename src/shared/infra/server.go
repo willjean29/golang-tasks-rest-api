@@ -1,11 +1,9 @@
 package server
 
 import (
-	taskModels "app/src/modules/tasks/infra/data/gorm/entities"
-	userModels "app/src/modules/users/infra/data/gorm/entities"
 	error "app/src/shared/errors"
 
-	db "app/src/shared/infra/gorm"
+	db "app/src/shared/data/gorm"
 
 	"app/src/shared/infra/http/middlewares"
 	"app/src/shared/infra/http/routes"
@@ -48,8 +46,7 @@ func (server *Server) LoadEnv() {
 
 func (s *Server) DBConnection() {
 	// connection database
-	db.DBConnection()
-	db.DB.AutoMigrate(&taskModels.Task{}, &userModels.User{})
+	db.GormSyncDatabase()
 }
 
 func (s *Server) Routes() {

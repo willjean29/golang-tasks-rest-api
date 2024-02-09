@@ -4,8 +4,8 @@ import (
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/infra/data/gorm/entities"
 	"app/src/modules/tasks/infra/data/gorm/utils"
+	db "app/src/shared/data/gorm"
 	error "app/src/shared/errors"
-	db "app/src/shared/infra/gorm"
 	"errors"
 
 	"gorm.io/gorm"
