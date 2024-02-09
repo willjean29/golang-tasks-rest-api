@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"app/src/modules/tasks/infra/gorm/entities"
+	"app/src/modules/tasks/infra/data/gorm/entities"
 	"encoding/json"
 	"time"
 

@@ -2,7 +2,7 @@ package utils
 
 import (
 	taskModels "app/src/modules/tasks/domain/models"
-	"app/src/modules/tasks/infra/utils"
+	"app/src/modules/tasks/infra/data/gorm/utils"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/infra/gorm/entities"
 )

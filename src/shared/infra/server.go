@@ -1,7 +1,7 @@
 package server
 
 import (
-	taskModels "app/src/modules/tasks/infra/gorm/entities"
+	taskModels "app/src/modules/tasks/infra/data/gorm/entities"
 	userModels "app/src/modules/users/infra/gorm/entities"
 	error "app/src/shared/errors"
 

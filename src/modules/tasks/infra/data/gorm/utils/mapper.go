@@ -2,7 +2,7 @@ package utils
 
 import (
 	"app/src/modules/tasks/domain/models"
-	"app/src/modules/tasks/infra/gorm/entities"
+	"app/src/modules/tasks/infra/data/gorm/entities"
 )
 
 func MapperToTaskEntity(task models.ITask) entities.Task {
