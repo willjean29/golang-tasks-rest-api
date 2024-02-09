@@ -7,6 +7,15 @@ import (
 	"app/src/modules/users/infra/gorm/entities"
 )
 
+func MapperToUserEntity(mapper models.IUser) entities.User {
+	return entities.User{
+		Name:     mapper.Name,
+		Email:    mapper.Email,
+		Password: mapper.Password,
+		Image:    mapper.Image,
+	}
+}
+
 func MapperToUser(user entities.User) models.IUser {
 	tasks := []taskModels.ITask{}
 	if len(user.Tasks) > 0 {

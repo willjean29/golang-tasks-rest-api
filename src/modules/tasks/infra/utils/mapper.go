@@ -5,6 +5,14 @@ import (
 	"app/src/modules/tasks/infra/gorm/entities"
 )
 
+func MapperToTaskEntity(task models.ITask) entities.Task {
+	return entities.Task{
+		Name:    task.Name,
+		Content: task.Content,
+		Image:   task.Image,
+	}
+}
+
 func MapperToTask(task entities.Task) models.ITask {
 	return models.ITask{
 		ID:        task.ID,

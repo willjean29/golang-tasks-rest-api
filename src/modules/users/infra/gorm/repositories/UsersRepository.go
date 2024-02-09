@@ -6,6 +6,7 @@ import (
 	"app/src/modules/users/infra/utils"
 	error "app/src/shared/errors"
 	"errors"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -95,4 +96,24 @@ func (u *UsersRepository) Create(createUser models.ICreateUser) (models.IUser, e
 	}
 	userModel := utils.MapperToUser(user)
 	return userModel, error.Error{}
+}
+
+func (u *UsersRepository) Save(user models.IUser) error.Error {
+	log.Println(user)
+	userEntity := utils.MapperToUserEntity(user)
+	log.Println(userEntity)
+
+	query := u.Repository.Where("id = ?", user.ID).Updates(&userEntity)
+	err := query.Error
+	if query.RowsAffected == 0 {
+		return *error.New("User not created", 400, errors.New("User not created"))
+	}
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return *error.New("User not updated", 400, errors.New(err.Error()))
+		} else {
+			return *error.New("Error update user", 500, errors.New(err.Error()))
+		}
+	}
+	return error.Error{}
 }

@@ -116,3 +116,20 @@ func (t *TasksRepository) Update(updateTask models.IUpdateTask, id int) (models.
 	taskModel := utils.MapperToTask(task)
 	return taskModel, error.Error{}
 }
+
+func (t *TasksRepository) Save(task models.ITask) error.Error {
+	taskEntity := utils.MapperToTaskEntity(task)
+	query := t.Repository.Where("id = ?", task.ID).Updates(&taskEntity)
+	err := query.Error
+	if query.RowsAffected == 0 {
+		return *error.New("Task not created", 400, errors.New("Task not created"))
+	}
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return *error.New("Task not updated", 400, errors.New(err.Error()))
+		} else {
+			return *error.New("Error update task", 500, errors.New(err.Error()))
+		}
+	}
+	return error.Error{}
+}
