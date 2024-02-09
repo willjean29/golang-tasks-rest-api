@@ -4,9 +4,9 @@ import (
 	usecases "app/src/modules/users/app"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/domain/validators"
-	"app/src/modules/users/infra/gorm/repositories"
+	"app/src/modules/users/infra/datasource"
+	"app/src/modules/users/infra/repositories"
 	error "app/src/shared/errors"
-	db "app/src/shared/infra/gorm"
 	"app/src/shared/utils"
 	"encoding/json"
 	"net/http"
@@ -17,14 +17,15 @@ import (
 )
 
 var userValidator validators.UserValidator = validators.NewUserValidator()
+var userRepository = &repositories.UsersRepository{
+	Datasource: &datasource.UserDatasource{},
+}
 
 type UsersController struct{}
 
 func (u *UsersController) List(w http.ResponseWriter, r *http.Request) {
 	usecase := usecases.ListUserUseCase{
-		UserRepository: &repositories.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 	users, errorApp := usecase.Execute()
 	if errorApp.StatusCode != 0 {
@@ -46,9 +47,7 @@ func (u *UsersController) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.GetUserUseCase{
-		UserRepository: &repositories.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 	user, errorApp := usecase.Execute(userId)
 	if errorApp.StatusCode != 0 {
@@ -77,9 +76,7 @@ func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.CreateSessionUseCase{
-		UserRepository: &repositories.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 
 	user, token, errorApp := usecase.Execute(createSession)
@@ -116,9 +113,7 @@ func (u *UsersController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	usecase := usecases.CreateUserUseCase{
-		UserRepository: &repositories.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 
 	user, token, errorApp := usecase.Execute(createUser)

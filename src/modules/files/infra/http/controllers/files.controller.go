@@ -2,13 +2,14 @@ package controllers
 
 import (
 	taskUsecases "app/src/modules/tasks/app"
-	"app/src/modules/tasks/infra/datasource"
+	taskDatasource "app/src/modules/tasks/infra/datasource"
+	userDatasource "app/src/modules/users/infra/datasource"
+
 	taskRepositories "app/src/modules/tasks/infra/repositories"
 	userUsecases "app/src/modules/users/app"
-	userRepository "app/src/modules/users/infra/gorm/repositories"
+	userRepositories "app/src/modules/users/infra/repositories"
 	store "app/src/shared/adapters/storage"
 	error "app/src/shared/errors"
-	db "app/src/shared/infra/gorm"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -20,7 +21,10 @@ import (
 var collections = []string{"tasks", "users"}
 var storeAdapter store.StoreAdapter = &store.DiskAdapter{}
 var taskRepository = &taskRepositories.TasksRepository{
-	Datasource: &datasource.GormTaskDatasource{},
+	Datasource: &taskDatasource.GormTaskDatasource{},
+}
+var userRepository = &userRepositories.UsersRepository{
+	Datasource: &userDatasource.UserDatasource{},
 }
 
 type FilesController struct{}
@@ -52,7 +56,7 @@ func (f *FilesController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	switch vars["collection"] {
 	case "tasks":
 		log.Println("Upload file for task with id:", id)
-		message, errorApp := uploadFileTask(id, filename)
+		message, errorApp := uploadTaskFile(id, filename)
 		if errorApp.StatusCode != 0 {
 			w.WriteHeader(errorApp.StatusCode)
 			json.NewEncoder(w).Encode(errorApp)
@@ -61,7 +65,7 @@ func (f *FilesController) UploadFile(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(message)
 	case "users":
 		log.Println("Upload file for user with id:", id)
-		message, errorApp := uploadedFileTask(id, filename)
+		message, errorApp := uploadUserFile(id, filename)
 		if errorApp.StatusCode != 0 {
 			w.WriteHeader(errorApp.StatusCode)
 			json.NewEncoder(w).Encode(errorApp)
@@ -71,7 +75,7 @@ func (f *FilesController) UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func uploadFileTask(taskId int, filename string) (map[string]string, error.Error) {
+func uploadTaskFile(taskId int, filename string) (map[string]string, error.Error) {
 	getTaskUseCase := taskUsecases.GetTaskUseCase{
 		TaskRepository: taskRepository,
 	}
@@ -94,12 +98,10 @@ func uploadFileTask(taskId int, filename string) (map[string]string, error.Error
 	return map[string]string{"message": "File uploaded successfully"}, error.Error{}
 }
 
-func uploadedFileTask(userId int, filename string) (map[string]string, error.Error) {
+func uploadUserFile(userId int, filename string) (map[string]string, error.Error) {
 
 	getUserUseCase := userUsecases.GetUserUseCase{
-		UserRepository: &userRepository.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 	user, errorApp := getUserUseCase.Execute(userId)
 	if errorApp.StatusCode != 0 {
@@ -110,9 +112,7 @@ func uploadedFileTask(userId int, filename string) (map[string]string, error.Err
 	}
 	user.Image, _ = storeAdapter.SaveFile(filename)
 	saveUserUseCase := userUsecases.SaveUserUseCase{
-		UserRepository: &userRepository.UsersRepository{
-			Repository: db.DB,
-		},
+		UserRepository: userRepository,
 	}
 	errorApp = saveUserUseCase.Execute(user)
 	if errorApp.StatusCode != 0 {
