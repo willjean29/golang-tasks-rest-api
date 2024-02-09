@@ -8,7 +8,7 @@ import (
 	"app/src/modules/tasks/domain/models"
 	"app/src/modules/tasks/domain/validators"
 	"app/src/modules/tasks/infra/gorm/repositories"
-	"app/utils"
+	"app/src/shared/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"

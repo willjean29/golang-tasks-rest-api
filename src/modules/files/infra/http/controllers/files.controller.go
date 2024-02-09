@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	store "app/providers/StorageProvider"
 	taskUsecases "app/src/modules/tasks/app"
 	taskRepository "app/src/modules/tasks/infra/gorm/repositories"
 	userUsecases "app/src/modules/users/app"
 	userRepository "app/src/modules/users/infra/gorm/repositories"
+	store "app/src/shared/adapters/storage"
 	error "app/src/shared/errors"
 	db "app/src/shared/infra/gorm"
 	"encoding/json"
@@ -17,7 +17,7 @@ import (
 )
 
 var collections = []string{"tasks", "users"}
-var storeProvider store.StoreProvider = &store.DiskProvider{}
+var storeAdapter store.StoreAdapter = &store.DiskAdapter{}
 
 type FilesController struct{}
 
@@ -78,10 +78,10 @@ func uploadFileTask(taskId int, filename string) (map[string]string, error.Error
 		return map[string]string{}, errorApp
 	}
 	if task.Image != "" {
-		storeProvider.DeleteFile(task.Image)
+		storeAdapter.DeleteFile(task.Image)
 	}
 
-	task.Image, _ = storeProvider.SaveFile(filename)
+	task.Image, _ = storeAdapter.SaveFile(filename)
 	saveTask := taskUsecases.SaveTaskUseCase{
 		TaskRepository: &taskRepository.TasksRepository{
 			Repository: db.DB,
@@ -106,9 +106,9 @@ func uploadedFileTask(userId int, filename string) (map[string]string, error.Err
 		return map[string]string{}, errorApp
 	}
 	if user.Image != "" {
-		storeProvider.DeleteFile(user.Image)
+		storeAdapter.DeleteFile(user.Image)
 	}
-	user.Image, _ = storeProvider.SaveFile(filename)
+	user.Image, _ = storeAdapter.SaveFile(filename)
 	saveUserUseCase := userUsecases.SaveUserUseCase{
 		UserRepository: &userRepository.UsersRepository{
 			Repository: db.DB,

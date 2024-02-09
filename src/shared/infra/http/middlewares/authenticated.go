@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	token "app/providers/TokenProvider"
+	token "app/src/shared/adapters/token"
 	error "app/src/shared/errors"
 	"context"
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-var tokenProvider token.TokenProvider = token.NewJwtProvider()
+var tokenAdapter token.TokenAdapter = token.NewJwtAdapter()
 
 func Authenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,7 @@ func Authenticated(next http.Handler) http.Handler {
 			return
 		}
 		token := cookie.Value
-		isValidToken, tokenDecoded, err := tokenProvider.ValidateToken(token)
+		isValidToken, tokenDecoded, err := tokenAdapter.ValidateToken(token)
 		if !isValidToken {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(error.New("Unauthorized (Token invalid)", http.StatusUnauthorized, err))

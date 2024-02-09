@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"app/error"
+	error "app/src/shared/errors"
 	"context"
 	"encoding/json"
 	"io"

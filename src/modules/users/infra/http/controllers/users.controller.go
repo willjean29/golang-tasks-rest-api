@@ -7,7 +7,7 @@ import (
 	"app/src/modules/users/infra/gorm/repositories"
 	error "app/src/shared/errors"
 	db "app/src/shared/infra/gorm"
-	"app/utils"
+	"app/src/shared/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
