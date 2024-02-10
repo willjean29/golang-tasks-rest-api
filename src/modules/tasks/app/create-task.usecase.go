@@ -7,7 +7,7 @@ import (
 )
 
 type CreateTaskUseCase struct {
-	TaskRepository repositories.ITaskRepository
+	TaskRepository repositories.TaskRepository
 }
 
 func (l *CreateTaskUseCase) Execute(createProduct entities.CreateTask, userId uint) (entities.Task, error.Error) {

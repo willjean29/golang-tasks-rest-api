@@ -88,10 +88,10 @@ func uploadTaskFile(taskId int, filename string) (map[string]string, error.Error
 	}
 
 	task.Image, _ = storeAdapter.SaveFile(filename)
-	saveTask := taskUsecases.SaveTaskUseCase{
+	saveTaskUseCase := taskUsecases.SaveTaskUseCase{
 		TaskRepository: taskRepository,
 	}
-	errorApp = saveTask.Execute(task)
+	errorApp = saveTaskUseCase.Execute(task)
 	if errorApp.StatusCode != 0 {
 
 	}

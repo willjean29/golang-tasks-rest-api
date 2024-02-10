@@ -7,7 +7,7 @@ import (
 )
 
 type TasksRepository struct {
-	Datasource datasource.ITaskDatasource
+	Datasource datasource.TaskDatasource
 }
 
 func (t *TasksRepository) FindAll(userId uint) (entities.ListTask, error.Error) {

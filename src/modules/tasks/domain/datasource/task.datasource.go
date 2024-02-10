@@ -5,7 +5,7 @@ import (
 	error "app/src/shared/errors"
 )
 
-type ITaskDatasource interface {
+type TaskDatasource interface {
 	FindAll(userId uint) (entities.ListTask, error.Error)
 	FindById(id int) (entities.Task, error.Error)
 	Create(task entities.CreateTask, userId uint) (entities.Task, error.Error)

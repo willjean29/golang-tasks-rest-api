@@ -7,7 +7,7 @@ import (
 )
 
 type UpdateTaskUseCase struct {
-	TaskRepository repositories.ITaskRepository
+	TaskRepository repositories.TaskRepository
 }
 
 func (l *UpdateTaskUseCase) Execute(updateProduct entities.UpdateTask, id int) (entities.Task, error.Error) {

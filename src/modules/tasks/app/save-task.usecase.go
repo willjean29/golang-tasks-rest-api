@@ -7,7 +7,7 @@ import (
 )
 
 type SaveTaskUseCase struct {
-	TaskRepository repositories.ITaskRepository
+	TaskRepository repositories.TaskRepository
 }
 
 func (s *SaveTaskUseCase) Execute(task entities.Task) error.Error {

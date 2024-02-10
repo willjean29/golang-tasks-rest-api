@@ -9,7 +9,7 @@ import (
 )
 
 func TaskRoutes(router *mux.Router) {
-	var tasksController = controllers.TasksController{}
+	var tasksController = controllers.TaskController{}
 	taskRouter := router.PathPrefix("/tasks").Subrouter()
 	taskRouter.Use(middlewares.Authenticated)
 	taskRouter.HandleFunc("", tasksController.List).Methods(http.MethodGet)

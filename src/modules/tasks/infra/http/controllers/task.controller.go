@@ -21,15 +21,15 @@ var taskRepository = &repositories.TasksRepository{
 	Datasource: &datasource.GormTaskDatasource{},
 }
 
-type TasksController struct{}
+type TaskController struct{}
 
-func (t *TasksController) List(w http.ResponseWriter, r *http.Request) {
+func (t *TaskController) List(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value("userId").(int)
-	usecase := usecases.ListTasksUseCase{
+	listTasksUseCase := usecases.ListTasksUseCase{
 		TaskRepository: taskRepository,
 	}
 
-	tasks, errorApp := usecase.Execute(uint(userId))
+	tasks, errorApp := listTasksUseCase.Execute(uint(userId))
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
@@ -40,7 +40,7 @@ func (t *TasksController) List(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tasks)
 }
 
-func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
+func (t *TaskController) Show(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -48,11 +48,11 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.GetTaskUseCase{
+	getTaskUseCase := usecases.GetTaskUseCase{
 		TaskRepository: taskRepository,
 	}
 
-	tasks, errorApp := usecase.Execute(taskID)
+	tasks, errorApp := getTaskUseCase.Execute(taskID)
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
@@ -63,7 +63,7 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tasks)
 }
 
-func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
+func (t *TaskController) Create(w http.ResponseWriter, r *http.Request) {
 	var createTask entities.CreateTask
 
 	err := utils.TransformBody(r.Body, &createTask)
@@ -73,7 +73,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.CreateTaskUseCase{
+	createTaskUseCase := usecases.CreateTaskUseCase{
 		TaskRepository: taskRepository,
 	}
 	err = taskValidator.ValidateCreateTask(createTask)
@@ -83,7 +83,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, errorApp := usecase.Execute(createTask, uint(userId))
+	task, errorApp := createTaskUseCase.Execute(createTask, uint(userId))
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
@@ -94,7 +94,7 @@ func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(task)
 }
 
-func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
+func (t *TaskController) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -103,11 +103,11 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.DeleteTaskUseCase{
+	deleteTaskUseCase := usecases.DeleteTaskUseCase{
 		TaskRepository: taskRepository,
 	}
 
-	errorApp := usecase.Execute(taskID)
+	errorApp := deleteTaskUseCase.Execute(taskID)
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
@@ -120,7 +120,7 @@ func (t *TasksController) Delete(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
+func (t *TaskController) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	taskID, err := strconv.Atoi(vars["id"])
 
@@ -144,11 +144,11 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid Task Data", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.UpdateTaskUseCase{
+	updateTaskUseCase := usecases.UpdateTaskUseCase{
 		TaskRepository: taskRepository,
 	}
 
-	_, errorApp := usecase.Execute(updateTask, taskID)
+	_, errorApp := updateTaskUseCase.Execute(updateTask, taskID)
 
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)

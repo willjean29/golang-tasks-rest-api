@@ -6,7 +6,7 @@ import (
 )
 
 type DeleteTaskUseCase struct {
-	TaskRepository repositories.ITaskRepository
+	TaskRepository repositories.TaskRepository
 }
 
 func (l *DeleteTaskUseCase) Execute(id int) error.Error {
