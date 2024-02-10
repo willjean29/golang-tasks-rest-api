@@ -1,8 +1,8 @@
 package datasource
 
 import (
-	"app/src/modules/tasks/domain/models"
-	"app/src/modules/tasks/infra/data/gorm/entities"
+	"app/src/modules/tasks/domain/entities"
+	"app/src/modules/tasks/infra/data/gorm/models"
 	"app/src/modules/tasks/infra/data/gorm/utils"
 	db "app/src/shared/data/gorm"
 	error "app/src/shared/errors"
@@ -13,18 +13,18 @@ import (
 
 type GormTaskDatasource struct{}
 
-func (g *GormTaskDatasource) FindAll(userId uint) (models.IListTask, error.Error) {
-	var listTask models.IListTask
-	var list entities.ListTask
+func (g *GormTaskDatasource) FindAll(userId uint) (entities.ListTask, error.Error) {
+	var listTask entities.ListTask
+	var list models.ListTask
 
 	query := db.DB.Where("user_id = ?", userId).Find(&list)
 	err := query.Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.IListTask{}, *error.New("Data of tasks not found", 404, errors.New(err.Error()))
+			return entities.ListTask{}, *error.New("Data of tasks not found", 404, errors.New(err.Error()))
 		} else {
-			return models.IListTask{}, *error.New("Error get list task", 500, errors.New(err.Error()))
+			return entities.ListTask{}, *error.New("Error get list task", 500, errors.New(err.Error()))
 		}
 	}
 
@@ -32,18 +32,18 @@ func (g *GormTaskDatasource) FindAll(userId uint) (models.IListTask, error.Error
 	return listTask, error.Error{}
 }
 
-func (g *GormTaskDatasource) FindById(id int) (models.ITask, error.Error) {
+func (g *GormTaskDatasource) FindById(id int) (entities.Task, error.Error) {
 
-	var task entities.Task
+	var task models.Task
 
 	query := db.DB.First(&task, id)
 	err := query.Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.ITask{}, *error.New("Task not found", 404, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Task not found", 404, errors.New(err.Error()))
 		} else {
-			return models.ITask{}, *error.New("Error get task", 500, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Error get task", 500, errors.New(err.Error()))
 		}
 	}
 
@@ -52,8 +52,8 @@ func (g *GormTaskDatasource) FindById(id int) (models.ITask, error.Error) {
 	return taskModel, error.Error{}
 }
 
-func (g *GormTaskDatasource) Create(createTask models.ICreateTask, userId uint) (models.ITask, error.Error) {
-	task := entities.Task{
+func (g *GormTaskDatasource) Create(createTask entities.CreateTask, userId uint) (entities.Task, error.Error) {
+	task := models.Task{
 		Name:    createTask.Name,
 		Content: createTask.Content,
 		UserID:  userId,
@@ -64,9 +64,9 @@ func (g *GormTaskDatasource) Create(createTask models.ICreateTask, userId uint) 
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.ITask{}, *error.New("Task not created", 400, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Task not created", 400, errors.New(err.Error()))
 		} else {
-			return models.ITask{}, *error.New("Error create task", 500, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Error create task", 500, errors.New(err.Error()))
 		}
 	}
 	taskModel := utils.MapperToTask(task)
@@ -74,7 +74,7 @@ func (g *GormTaskDatasource) Create(createTask models.ICreateTask, userId uint) 
 }
 
 func (g *GormTaskDatasource) Delete(id int) error.Error {
-	var task entities.Task
+	var task models.Task
 	query := db.DB.Delete(&task, id)
 	err := query.Error
 
@@ -93,8 +93,8 @@ func (g *GormTaskDatasource) Delete(id int) error.Error {
 	return error.Error{}
 }
 
-func (g *GormTaskDatasource) Update(updateTask models.IUpdateTask, id int) (models.ITask, error.Error) {
-	task := entities.Task{
+func (g *GormTaskDatasource) Update(updateTask entities.UpdateTask, id int) (entities.Task, error.Error) {
+	task := models.Task{
 		Name:    updateTask.Name,
 		Content: updateTask.Content,
 	}
@@ -104,20 +104,20 @@ func (g *GormTaskDatasource) Update(updateTask models.IUpdateTask, id int) (mode
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return models.ITask{}, *error.New("Task not found", 404, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Task not found", 404, errors.New(err.Error()))
 		} else {
-			return models.ITask{}, *error.New("Error update task", 500, errors.New(err.Error()))
+			return entities.Task{}, *error.New("Error update task", 500, errors.New(err.Error()))
 		}
 	}
 	if query.RowsAffected == 0 {
-		return models.ITask{}, *error.New("Task not found", 404, errors.New("No task was updated"))
+		return entities.Task{}, *error.New("Task not found", 404, errors.New("No task was updated"))
 	}
 	taskModel := utils.MapperToTask(task)
 	return taskModel, error.Error{}
 }
 
-func (g *GormTaskDatasource) Save(task models.ITask) error.Error {
-	taskEntity := utils.MapperToTaskEntity(task)
+func (g *GormTaskDatasource) Save(task entities.Task) error.Error {
+	taskEntity := utils.MapperToTaskModel(task)
 	query := db.DB.Where("id = ?", task.ID).Updates(&taskEntity)
 	err := query.Error
 	if query.RowsAffected == 0 {

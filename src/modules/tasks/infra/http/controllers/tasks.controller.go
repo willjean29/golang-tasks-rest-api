@@ -2,7 +2,7 @@ package controllers
 
 import (
 	usecases "app/src/modules/tasks/app"
-	"app/src/modules/tasks/domain/models"
+	"app/src/modules/tasks/domain/entities"
 	"app/src/modules/tasks/domain/validators"
 	"app/src/modules/tasks/infra/datasource"
 	"app/src/modules/tasks/infra/repositories"
@@ -64,7 +64,7 @@ func (t *TasksController) Show(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *TasksController) Create(w http.ResponseWriter, r *http.Request) {
-	var createTask models.ICreateTask
+	var createTask entities.CreateTask
 
 	err := utils.TransformBody(r.Body, &createTask)
 	userId := r.Context().Value("userId").(int)
@@ -129,7 +129,7 @@ func (t *TasksController) Update(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
-	var updateTask models.IUpdateTask
+	var updateTask entities.UpdateTask
 
 	err = utils.TransformBody(r.Body, &updateTask)
 

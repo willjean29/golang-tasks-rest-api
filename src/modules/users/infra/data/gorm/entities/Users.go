@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"app/src/modules/tasks/infra/data/gorm/entities"
+	"app/src/modules/tasks/infra/data/gorm/models"
 	"encoding/json"
 	"time"
 
@@ -14,19 +14,19 @@ type User struct {
 	Email    string `gorm:"unique"`
 	Password string
 	Image    string `gorm:"default:null"`
-	Tasks    []entities.Task
+	Tasks    []models.Task
 }
 
 type UserJSON struct {
-	ID        uint            `json:"id"`
-	Name      string          `json:"name"`
-	Email     string          `json:"email"`
-	Password  string          `json:"password"`
-	Image     string          `json:"image"`
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
-	DeletedAt gorm.DeletedAt  `json:"deleted_at"`
-	Tasks     []entities.Task `json:"tasks"`
+	ID        uint           `json:"id"`
+	Name      string         `json:"name"`
+	Email     string         `json:"email"`
+	Password  string         `json:"password"`
+	Image     string         `json:"image"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	Tasks     []models.Task  `json:"tasks"`
 }
 
 func (u *User) MarshalJSON() ([]byte, error) {

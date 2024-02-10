@@ -1,7 +1,7 @@
 package utils
 
 import (
-	taskModels "app/src/modules/tasks/domain/models"
+	taskEntities "app/src/modules/tasks/domain/entities"
 	"app/src/modules/tasks/infra/data/gorm/utils"
 	"app/src/modules/users/domain/models"
 	"app/src/modules/users/infra/data/gorm/entities"
@@ -17,7 +17,7 @@ func MapperToUserEntity(mapper models.IUser) entities.User {
 }
 
 func MapperToUser(user entities.User) models.IUser {
-	tasks := []taskModels.ITask{}
+	tasks := []taskEntities.Task{}
 	if len(user.Tasks) > 0 {
 		tasks = utils.MapperToTasks(user.Tasks)
 	}

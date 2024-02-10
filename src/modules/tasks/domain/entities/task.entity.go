@@ -1,8 +1,8 @@
-package models
+package entities
 
 import "time"
 
-type ITask struct {
+type Task struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Content   string    `json:"content"`
@@ -11,4 +11,4 @@ type ITask struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type IListTask []ITask
+type ListTask []Task

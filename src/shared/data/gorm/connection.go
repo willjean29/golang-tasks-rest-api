@@ -1,7 +1,7 @@
 package db
 
 import (
-	taskModels "app/src/modules/tasks/infra/data/gorm/entities"
+	taskModels "app/src/modules/tasks/infra/data/gorm/models"
 	userModels "app/src/modules/users/infra/data/gorm/entities"
 	"log"
 
