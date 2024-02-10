@@ -23,8 +23,8 @@ var storeAdapter store.StoreAdapter = &store.DiskAdapter{}
 var taskRepository = &taskRepositories.TasksRepository{
 	Datasource: &taskDatasource.GormTaskDatasource{},
 }
-var userRepository = &userRepositories.UsersRepository{
-	Datasource: &userDatasource.UserDatasource{},
+var userRepository = &userRepositories.UserRepository{
+	Datasource: &userDatasource.GormUserDatasource{},
 }
 
 type FilesController struct{}

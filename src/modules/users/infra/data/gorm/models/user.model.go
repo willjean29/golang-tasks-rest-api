@@ -1,4 +1,4 @@
-package entities
+package models
 
 import (
 	"app/src/modules/tasks/infra/data/gorm/models"

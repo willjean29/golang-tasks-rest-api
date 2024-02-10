@@ -9,7 +9,7 @@ import (
 )
 
 func UserRoutes(router *mux.Router) {
-	var usersController = controllers.UsersController{}
+	var usersController = controllers.UserController{}
 	authRouter := router.PathPrefix("/auth").Subrouter()
 	userRouter := router.PathPrefix("/users").Subrouter()
 

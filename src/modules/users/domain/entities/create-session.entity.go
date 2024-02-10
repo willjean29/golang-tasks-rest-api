@@ -1,7 +1,6 @@
-package models
+package entities
 
-type ICreateUser struct {
-	Name     string `json:"name" validate:"required"`
+type CreateSession struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
 }

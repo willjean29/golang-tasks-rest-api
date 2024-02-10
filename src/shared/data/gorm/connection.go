@@ -2,7 +2,7 @@ package db
 
 import (
 	taskModels "app/src/modules/tasks/infra/data/gorm/models"
-	userModels "app/src/modules/users/infra/data/gorm/entities"
+	userModels "app/src/modules/users/infra/data/gorm/models"
 	"log"
 
 	"gorm.io/driver/postgres"

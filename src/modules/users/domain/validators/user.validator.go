@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"app/src/modules/users/domain/models"
+	"app/src/modules/users/domain/entities"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -16,13 +16,13 @@ func NewUserValidator() UserValidator {
 	return UserValidator{}
 }
 
-func (u *UserValidator) ValidateCreateUser(createUser models.ICreateUser) error {
+func (u *UserValidator) ValidateCreateUser(createUser entities.CreateUser) error {
 	var err error
 	err = validate.Struct(createUser)
 	return err
 }
 
-func (u *UserValidator) ValidateLogin(createSession models.ICreateSession) error {
+func (u *UserValidator) ValidateLogin(createSession entities.CreateSession) error {
 	var err error
 	err = validate.Struct(createSession)
 	return err

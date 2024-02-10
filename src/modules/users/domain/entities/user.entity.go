@@ -1,11 +1,11 @@
-package models
+package entities
 
 import (
 	"app/src/modules/tasks/domain/entities"
 	"time"
 )
 
-type IUser struct {
+type User struct {
 	ID        uint            `json:"id"`
 	Name      string          `json:"name"`
 	Email     string          `json:"email"`
@@ -16,4 +16,4 @@ type IUser struct {
 	Tasks     []entities.Task `json:"tasks"`
 }
 
-type IListUsers []IUser
+type ListUsers []User

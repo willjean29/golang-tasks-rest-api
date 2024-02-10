@@ -2,7 +2,7 @@ package controllers
 
 import (
 	usecases "app/src/modules/users/app"
-	"app/src/modules/users/domain/models"
+	"app/src/modules/users/domain/entities"
 	"app/src/modules/users/domain/validators"
 	"app/src/modules/users/infra/datasource"
 	"app/src/modules/users/infra/repositories"
@@ -17,17 +17,17 @@ import (
 )
 
 var userValidator validators.UserValidator = validators.NewUserValidator()
-var userRepository = &repositories.UsersRepository{
-	Datasource: &datasource.UserDatasource{},
+var userRepository = &repositories.UserRepository{
+	Datasource: &datasource.GormUserDatasource{},
 }
 
-type UsersController struct{}
+type UserController struct{}
 
-func (u *UsersController) List(w http.ResponseWriter, r *http.Request) {
-	usecase := usecases.ListUserUseCase{
+func (u *UserController) List(w http.ResponseWriter, r *http.Request) {
+	listUserUseCase := usecases.ListUserUseCase{
 		UserRepository: userRepository,
 	}
-	users, errorApp := usecase.Execute()
+	users, errorApp := listUserUseCase.Execute()
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -38,7 +38,7 @@ func (u *UsersController) List(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-func (u *UsersController) Show(w http.ResponseWriter, r *http.Request) {
+func (u *UserController) Show(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -46,10 +46,10 @@ func (u *UsersController) Show(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Invalid ID", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.GetUserUseCase{
+	getUserUseCase := usecases.GetUserUseCase{
 		UserRepository: userRepository,
 	}
-	user, errorApp := usecase.Execute(userId)
+	user, errorApp := getUserUseCase.Execute(userId)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -60,8 +60,8 @@ func (u *UsersController) Show(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
-	var createSession models.ICreateSession
+func (u *UserController) Login(w http.ResponseWriter, r *http.Request) {
+	var createSession entities.CreateSession
 
 	err := utils.TransformBody(r.Body, &createSession)
 	if err != nil {
@@ -75,11 +75,11 @@ func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.CreateSessionUseCase{
+	createSessionUseCase := usecases.CreateSessionUseCase{
 		UserRepository: userRepository,
 	}
 
-	user, token, errorApp := usecase.Execute(createSession)
+	user, token, errorApp := createSessionUseCase.Execute(createSession)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)
@@ -96,8 +96,8 @@ func (u *UsersController) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (u *UsersController) Register(w http.ResponseWriter, r *http.Request) {
-	var createUser models.ICreateUser
+func (u *UserController) Register(w http.ResponseWriter, r *http.Request) {
+	var createUser entities.CreateUser
 
 	err := utils.TransformBody(r.Body, &createUser)
 	if err != nil {
@@ -112,11 +112,11 @@ func (u *UsersController) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(error.New("Insert a Valid User Data", http.StatusBadRequest, err))
 		return
 	}
-	usecase := usecases.CreateUserUseCase{
+	createUserUseCase := usecases.CreateUserUseCase{
 		UserRepository: userRepository,
 	}
 
-	user, token, errorApp := usecase.Execute(createUser)
+	user, token, errorApp := createUserUseCase.Execute(createUser)
 	if errorApp.StatusCode != 0 {
 		w.WriteHeader(errorApp.StatusCode)
 		json.NewEncoder(w).Encode(errorApp)

@@ -3,12 +3,12 @@ package utils
 import (
 	taskEntities "app/src/modules/tasks/domain/entities"
 	"app/src/modules/tasks/infra/data/gorm/utils"
-	"app/src/modules/users/domain/models"
-	"app/src/modules/users/infra/data/gorm/entities"
+	"app/src/modules/users/domain/entities"
+	"app/src/modules/users/infra/data/gorm/models"
 )
 
-func MapperToUserEntity(mapper models.IUser) entities.User {
-	return entities.User{
+func MapperToUserModel(mapper entities.User) models.User {
+	return models.User{
 		Name:     mapper.Name,
 		Email:    mapper.Email,
 		Password: mapper.Password,
@@ -16,13 +16,13 @@ func MapperToUserEntity(mapper models.IUser) entities.User {
 	}
 }
 
-func MapperToUser(user entities.User) models.IUser {
+func MapperToUser(user models.User) entities.User {
 	tasks := []taskEntities.Task{}
 	if len(user.Tasks) > 0 {
 		tasks = utils.MapperToTasks(user.Tasks)
 	}
 
-	return models.IUser{
+	return entities.User{
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
@@ -34,8 +34,8 @@ func MapperToUser(user entities.User) models.IUser {
 	}
 }
 
-func MapperToUsers(list entities.ListUsers) models.IListUsers {
-	var listUser models.IListUsers
+func MapperToUsers(list models.ListUsers) entities.ListUsers {
+	var listUser entities.ListUsers
 	for _, value := range list {
 		user := MapperToUser(value)
 		listUser = append(listUser, user)
