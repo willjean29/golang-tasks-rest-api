@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "jean",
+    "email": "admin10@gmail.com",
+    "password": "$2a$10$nwPu7AHZoS3O5vz4l.UMH.0FzYZfYhH2Q.J8lGYiVe/w3Fcf9WUra",
+    "image": "",
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "tasks": null
+  },
+  {
+    "id": 2,
+    "name": "jean",
+    "email": "admin11@gmail.com",
+    "password": "$2a$10$BNqRGVMEQ/UBS41o411G4uORMlXQ1C9nkhUbV3u1du7pAw7B.PbSG",
+    "image": "",
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "tasks": null
+  }
+]
