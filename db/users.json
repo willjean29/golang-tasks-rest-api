@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "jean",
+    "email": "admin20@gmail.com",
+    "password": "$2a$10$2nv4SiaZTAmI3w7rIbSZyuANPso15UumBUKWXtFW4qku65w5l5egi",
+    "image": "",
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "tasks": null
+  }
+]

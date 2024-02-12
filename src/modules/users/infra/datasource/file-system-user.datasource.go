@@ -8,11 +8,15 @@ import (
 	"os"
 )
 
+var folder = "db"
+var collection = "users"
+var path = folder + "/" + collection + ".json"
+
 type FileSistemUserDatasource struct{}
 
 func (f *FileSistemUserDatasource) FindAll() (entities.ListUsers, error.Error) {
 
-	file, err := os.Open("users.json")
+	file, err := os.Open(path)
 	if err != nil {
 		return entities.ListUsers{}, *error.New("Error to find users", 500, err)
 	}
@@ -32,7 +36,7 @@ func (f *FileSistemUserDatasource) FindAll() (entities.ListUsers, error.Error) {
 
 func (f *FileSistemUserDatasource) FindById(id int) (entities.User, error.Error) {
 
-	file, err := os.Open("/db/users.json")
+	file, err := os.Open(path)
 	if err != nil {
 		return entities.User{}, *error.New("Error to find user", 500, err)
 	}
@@ -58,7 +62,7 @@ func (f *FileSistemUserDatasource) FindById(id int) (entities.User, error.Error)
 
 func (f *FileSistemUserDatasource) FindByEmail(email string) (entities.User, error.Error) {
 
-	file, err := os.Open("/db/users.json")
+	file, err := os.Open(path)
 	if err != nil {
 		return entities.User{}, *error.New("Error to find user", 500, err)
 	}
@@ -94,7 +98,7 @@ func (f *FileSistemUserDatasource) Create(createUser entities.CreateUser) (entit
 	}
 
 	// Abre o crea el archivo "users.json" en modo lectura y escritura
-	file, err := os.OpenFile("users.json", os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Println("Error al abrir o crear el archivo:", err)
 		return entities.User{}, *error.New("Error to create user", 500, err)
@@ -153,7 +157,7 @@ func (f *FileSistemUserDatasource) Create(createUser entities.CreateUser) (entit
 
 func (f *FileSistemUserDatasource) Save(user entities.User) error.Error {
 
-	file, err := os.OpenFile("/db/users.json", os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return *error.New("Error to save user", 500, err)
 	}
