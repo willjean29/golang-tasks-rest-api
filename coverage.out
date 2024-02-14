@@ -11,9 +11,9 @@ app/src/modules/tasks/app/get-task.usecase.go:18.2,18.29 1 1
 app/src/modules/tasks/app/list-task.usecase.go:13.82,15.25 2 1
 app/src/modules/tasks/app/list-task.usecase.go:15.25,17.3 1 1
 app/src/modules/tasks/app/list-task.usecase.go:18.2,18.29 1 1
-app/src/modules/tasks/app/save-task.usecase.go:13.67,15.25 2 0
-app/src/modules/tasks/app/save-task.usecase.go:15.25,17.3 1 0
-app/src/modules/tasks/app/save-task.usecase.go:18.2,18.22 1 0
+app/src/modules/tasks/app/save-task.usecase.go:13.67,15.25 2 1
+app/src/modules/tasks/app/save-task.usecase.go:15.25,17.3 1 1
+app/src/modules/tasks/app/save-task.usecase.go:18.2,18.22 1 1
 app/src/modules/tasks/app/update-task.usecase.go:13.109,15.25 2 0
 app/src/modules/tasks/app/update-task.usecase.go:15.25,17.3 1 0
 app/src/modules/tasks/app/update-task.usecase.go:18.2,18.29 1 0
