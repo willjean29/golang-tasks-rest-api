@@ -1,0 +1,19 @@
+mode: set
+app/src/modules/tasks/app/create-task.usecase.go:13.114,15.25 2 1
+app/src/modules/tasks/app/create-task.usecase.go:15.25,17.3 1 1
+app/src/modules/tasks/app/create-task.usecase.go:18.2,18.29 1 1
+app/src/modules/tasks/app/delete-task.usecase.go:12.57,14.25 2 0
+app/src/modules/tasks/app/delete-task.usecase.go:14.25,16.3 1 0
+app/src/modules/tasks/app/delete-task.usecase.go:17.2,17.22 1 0
+app/src/modules/tasks/app/get-task.usecase.go:13.71,15.25 2 0
+app/src/modules/tasks/app/get-task.usecase.go:15.25,17.3 1 0
+app/src/modules/tasks/app/get-task.usecase.go:18.2,18.29 1 0
+app/src/modules/tasks/app/list-task.usecase.go:13.82,15.25 2 0
+app/src/modules/tasks/app/list-task.usecase.go:15.25,17.3 1 0
+app/src/modules/tasks/app/list-task.usecase.go:18.2,18.29 1 0
+app/src/modules/tasks/app/save-task.usecase.go:13.67,15.25 2 0
+app/src/modules/tasks/app/save-task.usecase.go:15.25,17.3 1 0
+app/src/modules/tasks/app/save-task.usecase.go:18.2,18.22 1 0
+app/src/modules/tasks/app/update-task.usecase.go:13.109,15.25 2 0
+app/src/modules/tasks/app/update-task.usecase.go:15.25,17.3 1 0
+app/src/modules/tasks/app/update-task.usecase.go:18.2,18.29 1 0
