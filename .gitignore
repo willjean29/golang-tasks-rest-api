@@ -1,5 +1,6 @@
 data/postgres
 data/mysql
+.scannerwork/
 
 uploads/*
 
