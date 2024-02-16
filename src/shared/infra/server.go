@@ -14,7 +14,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
 type Server struct {
@@ -30,18 +29,11 @@ func NewServer() (*Server, error.Error) {
 		port:   port,
 		router: router,
 	}
-	server.LoadEnv()
+
 	server.DBConnection()
 	server.Middlewares()
 	server.Routes()
 	return server, error.Error{}
-}
-
-func (server *Server) LoadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 }
 
 func (s *Server) DBConnection() {

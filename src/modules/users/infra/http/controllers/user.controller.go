@@ -18,8 +18,8 @@ import (
 
 var userValidator validators.UserValidator = validators.NewUserValidator()
 var userRepository = &repositories.UserRepository{
-	// Datasource: &datasource.GormUserDatasource{},
-	Datasource: &datasource.FileSistemUserDatasource{},
+	Datasource: &datasource.GormUserDatasource{},
+	// Datasource: &datasource.FileSistemUserDatasource{},
 }
 
 type UserController struct{}

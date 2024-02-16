@@ -1,15 +1,18 @@
 package db
 
 import (
+	"app/src/config/plugins"
 	taskModels "app/src/modules/tasks/infra/data/gorm/models"
 	userModels "app/src/modules/users/infra/data/gorm/models"
+	"fmt"
 	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DNS string = "host=localhost user=admin password=admin dbname=tasks port=5432"
+var DNS string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+	plugins.Envs.DBHost, plugins.Envs.DBUser, plugins.Envs.DBPassword, plugins.Envs.DBName, plugins.Envs.DBPort)
 var DB *gorm.DB
 
 func GormConnection() {

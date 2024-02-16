@@ -1,8 +1,8 @@
 package adapters
 
 import (
+	"app/src/config/plugins"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -14,7 +14,7 @@ type JwtAdapter struct {
 
 func NewJwtAdapter() *JwtAdapter {
 	return &JwtAdapter{
-		secret: os.Getenv("JWT_SECRET"),
+		secret: plugins.Envs.TokenSecretKey,
 	}
 }
 
@@ -37,7 +37,7 @@ func (j *JwtAdapter) GenerateToken(key string, value string) (string, error) {
 func (j *JwtAdapter) ValidateToken(tokenString string) (bool, map[string]interface{}, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(j.secret), nil
 	})
