@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>app: Go Coverage Report</title>
+		<title>plugins: Go Coverage Report</title>
 		<style>
 			body {
 				background: black;
@@ -55,17 +55,19 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">app/src/modules/tasks/app/create-task.usecase.go (100.0%)</option>
+				<option value="file0">app/src/config/plugins/env.plugin.go (87.5%)</option>
 				
-				<option value="file1">app/src/modules/tasks/app/delete-task.usecase.go (100.0%)</option>
+				<option value="file1">app/src/modules/tasks/app/create-task.usecase.go (100.0%)</option>
 				
-				<option value="file2">app/src/modules/tasks/app/get-task.usecase.go (100.0%)</option>
+				<option value="file2">app/src/modules/tasks/app/delete-task.usecase.go (100.0%)</option>
 				
-				<option value="file3">app/src/modules/tasks/app/list-task.usecase.go (100.0%)</option>
+				<option value="file3">app/src/modules/tasks/app/get-task.usecase.go (100.0%)</option>
 				
-				<option value="file4">app/src/modules/tasks/app/save-task.usecase.go (100.0%)</option>
+				<option value="file4">app/src/modules/tasks/app/list-task.usecase.go (100.0%)</option>
 				
-				<option value="file5">app/src/modules/tasks/app/update-task.usecase.go (100.0%)</option>
+				<option value="file5">app/src/modules/tasks/app/save-task.usecase.go (100.0%)</option>
+				
+				<option value="file6">app/src/modules/tasks/app/update-task.usecase.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -79,7 +81,61 @@
 		</div>
 		<div id="content">
 		
-		<pre class="file" id="file0" style="display: none">package usecases
+		<pre class="file" id="file0" style="display: none">package plugins
+
+import (
+        error "app/src/shared/errors"
+        "os"
+
+        "github.com/joho/godotenv"
+)
+
+type Env struct {
+        TokenSecretKey string
+        DBPort         string
+        DBHost         string
+        DBName         string
+        DBUser         string
+        DBPassword     string
+}
+type EnvLoader interface {
+        Load(string) (Env, error.Error)
+}
+
+func LoadEnv(env EnvLoader) (Env, error.Error) <span class="cov8" title="1">{
+        envs, err := env.Load(".env")
+        if err.StatusCode != 0 </span><span class="cov8" title="1">{
+                return Env{}, err
+        }</span>
+        <span class="cov8" title="1">return envs, error.Error{}</span>
+}
+
+// EnvLoaderGodotenv es una implementación de EnvLoader que carga las variables de entorno usando godotenv.
+type EnvLoaderGodotenv struct{}
+
+// Load carga las variables de entorno desde el archivo especificado utilizando godotenv.
+func (l *EnvLoaderGodotenv) Load(filename string) (Env, error.Error) <span class="cov8" title="1">{
+        err := godotenv.Load(filename)
+        if err != nil </span><span class="cov8" title="1">{
+                // Si hubo un error al cargar el archivo .env, devolvemos un error.
+                return Env{}, *error.New("Error loading .env file", 500, err)
+        }</span>
+
+        // Si no hubo errores, devolvemos las variables de entorno cargadas.
+        <span class="cov0" title="0">return Env{
+                TokenSecretKey: os.Getenv("JWT_SECRET_KEY"),
+                DBPort:         os.Getenv("DB_PORT"),
+                DBHost:         os.Getenv("DB_HOST"),
+                DBName:         os.Getenv("DB_NAME"),
+                DBUser:         os.Getenv("DB_USER"),
+                DBPassword:     os.Getenv("DB_PASSWORD"),
+        }, error.Error{}</span>
+}
+
+var Envs, _ = LoadEnv(&amp;EnvLoaderGodotenv{})
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/entities"
@@ -100,7 +156,7 @@ func (l *CreateTaskUseCase) Execute(createProduct entities.CreateTask, userId ui
 }
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package usecases
+		<pre class="file" id="file2" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/repositories"
@@ -120,7 +176,7 @@ func (l *DeleteTaskUseCase) Execute(id int) error.Error <span class="cov8" title
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package usecases
+		<pre class="file" id="file3" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/entities"
@@ -141,7 +197,7 @@ func (l *GetTaskUseCase) Execute(id int) (entities.Task, error.Error) <span clas
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package usecases
+		<pre class="file" id="file4" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/entities"
@@ -162,7 +218,7 @@ func (l *ListTasksUseCase) Execute(userId uint) (entities.ListTask, error.Error)
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package usecases
+		<pre class="file" id="file5" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/entities"
@@ -183,7 +239,7 @@ func (s *SaveTaskUseCase) Execute(task entities.Task) error.Error <span class="c
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package usecases
+		<pre class="file" id="file6" style="display: none">package usecases
 
 import (
         "app/src/modules/tasks/domain/entities"
