@@ -93,7 +93,7 @@ func uploadTaskFile(taskId int, filename string) (map[string]string, error.Error
 	}
 	errorApp = saveTaskUseCase.Execute(task)
 	if errorApp.StatusCode != 0 {
-
+		return map[string]string{}, errorApp
 	}
 	return map[string]string{"message": "File uploaded successfully"}, error.Error{}
 }
