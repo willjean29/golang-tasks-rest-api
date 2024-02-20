@@ -19,8 +19,8 @@ type EnvLoader interface {
 	Load(string) (Env, error.Error)
 }
 
-func LoadEnv(env EnvLoader) (Env, error.Error) {
-	envs, err := env.Load(".env")
+func LoadEnv(env EnvLoader, filename string) (Env, error.Error) {
+	envs, err := env.Load(filename)
 	if err.StatusCode != 0 {
 		return Env{}, err
 	}
@@ -40,7 +40,7 @@ func (l *EnvLoaderGodotenv) Load(filename string) (Env, error.Error) {
 
 	// Si no hubo errores, devolvemos las variables de entorno cargadas.
 	return Env{
-		TokenSecretKey: os.Getenv("JWT_SECRET_KEY"),
+		TokenSecretKey: os.Getenv("TOKEN_SECRET_KEY"),
 		DBPort:         os.Getenv("DB_PORT"),
 		DBHost:         os.Getenv("DB_HOST"),
 		DBName:         os.Getenv("DB_NAME"),
@@ -49,4 +49,4 @@ func (l *EnvLoaderGodotenv) Load(filename string) (Env, error.Error) {
 	}, error.Error{}
 }
 
-var Envs, _ = LoadEnv(&EnvLoaderGodotenv{})
+var Envs, _ = LoadEnv(&EnvLoaderGodotenv{}, ".env")

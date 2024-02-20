@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">app/src/config/plugins/env.plugin.go (87.5%)</option>
+				<option value="file0">app/src/config/plugins/env.plugin.go (100.0%)</option>
 				
 				<option value="file1">app/src/modules/tasks/app/create-task.usecase.go (100.0%)</option>
 				
@@ -102,8 +102,8 @@ type EnvLoader interface {
         Load(string) (Env, error.Error)
 }
 
-func LoadEnv(env EnvLoader) (Env, error.Error) <span class="cov8" title="1">{
-        envs, err := env.Load(".env")
+func LoadEnv(env EnvLoader, filename string) (Env, error.Error) <span class="cov8" title="1">{
+        envs, err := env.Load(filename)
         if err.StatusCode != 0 </span><span class="cov8" title="1">{
                 return Env{}, err
         }</span>
@@ -122,8 +122,8 @@ func (l *EnvLoaderGodotenv) Load(filename string) (Env, error.Error) <span class
         }</span>
 
         // Si no hubo errores, devolvemos las variables de entorno cargadas.
-        <span class="cov0" title="0">return Env{
-                TokenSecretKey: os.Getenv("JWT_SECRET_KEY"),
+        <span class="cov8" title="1">return Env{
+                TokenSecretKey: os.Getenv("TOKEN_SECRET_KEY"),
                 DBPort:         os.Getenv("DB_PORT"),
                 DBHost:         os.Getenv("DB_HOST"),
                 DBName:         os.Getenv("DB_NAME"),
@@ -132,7 +132,7 @@ func (l *EnvLoaderGodotenv) Load(filename string) (Env, error.Error) <span class
         }, error.Error{}</span>
 }
 
-var Envs, _ = LoadEnv(&amp;EnvLoaderGodotenv{})
+var Envs, _ = LoadEnv(&amp;EnvLoaderGodotenv{}, ".env")
 </pre>
 		
 		<pre class="file" id="file1" style="display: none">package usecases
