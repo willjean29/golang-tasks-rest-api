@@ -40,5 +40,8 @@ func MapperToUsers(list models.ListUsers) entities.ListUsers {
 		user := MapperToUser(value)
 		listUser = append(listUser, user)
 	}
+	if len(listUser) == 0 {
+		return entities.ListUsers{}
+	}
 	return listUser
 }

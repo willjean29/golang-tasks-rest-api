@@ -27,5 +27,5 @@ func GormConnection() {
 
 func GormSyncDatabase() {
 	GormConnection()
-	DB.AutoMigrate(&taskModels.Task{}, &userModels.User{})
+	DB.AutoMigrate(&userModels.User{}, &taskModels.Task{})
 }
