@@ -30,5 +30,8 @@ func MapperToTasks(list models.ListTask) entities.ListTask {
 		task := MapperToTask(value)
 		listTask = append(listTask, task)
 	}
+	if len(listTask) == 0 {
+		return entities.ListTask{}
+	}
 	return listTask
 }
