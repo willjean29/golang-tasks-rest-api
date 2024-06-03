@@ -5,6 +5,11 @@ import (
 )
 
 func main() {
-	newServer, _ := server.NewServer()
+	// server with gorilla/mux
+	// newServer, _ := server.NewServer()
+	// newServer.Run()
+
+	// server with gin
+	newServer := server.CreateServer()
 	newServer.Run()
 }
