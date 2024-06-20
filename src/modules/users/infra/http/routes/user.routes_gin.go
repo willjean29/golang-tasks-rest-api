@@ -1,20 +1,18 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"app/src/modules/users/infra/http/controllers"
+
+	"github.com/gin-gonic/gin"
+)
 
 func UserRoutesGin(router *gin.RouterGroup) {
+	var usersControllerGin = controllers.UserControllerGin{}
 	userRouter := router.Group("/users")
 	authRouter := router.Group("/auth")
-	userRouter.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "get all users",
-		})
-	})
-	userRouter.GET("/:id", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "get user by id",
-		})
-	})
+
+	userRouter.GET("/", usersControllerGin.List)
+	userRouter.GET("/:id", usersControllerGin.Show)
 
 	authRouter.POST("/login", func(c *gin.Context) {
 		c.JSON(200, gin.H{
