@@ -14,15 +14,6 @@ func UserRoutesGin(router *gin.RouterGroup) {
 	userRouter.GET("/", usersControllerGin.List)
 	userRouter.GET("/:id", usersControllerGin.Show)
 
-	authRouter.POST("/login", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "login user",
-		})
-	})
-
-	authRouter.POST("/register", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "register user",
-		})
-	})
+	authRouter.POST("/login", usersControllerGin.Login)
+	authRouter.POST("/register", usersControllerGin.Register)
 }
