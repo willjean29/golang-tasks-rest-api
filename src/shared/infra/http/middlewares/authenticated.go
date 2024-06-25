@@ -9,6 +9,10 @@ import (
 	"strconv"
 )
 
+type contextKey string
+
+const userKey contextKey = "userId"
+
 var tokenAdapter token.TokenAdapter = token.NewJwtAdapter()
 
 func Authenticated(next http.Handler) http.Handler {
@@ -34,7 +38,7 @@ func Authenticated(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode(error.New("Unauthorized (Error decoded token)", http.StatusUnauthorized, err))
 			return
 		}
-		ctx := context.WithValue(r.Context(), "userId", userId)
+		ctx := context.WithValue(r.Context(), userKey, userId)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

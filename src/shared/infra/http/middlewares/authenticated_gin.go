@@ -3,6 +3,7 @@ package middlewares
 import (
 	error "app/src/shared/errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,7 @@ import (
 func AuthenticatedGin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cookie, err := c.Cookie("token")
-		println(cookie)
+
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, error.New("Unauthorized", http.StatusUnauthorized, nil))
 			return
@@ -21,8 +22,16 @@ func AuthenticatedGin() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, error.New("Unauthorized (Token invalid)", http.StatusUnauthorized, err))
 			return
 		}
-		// Agregar el token decodificado al contexto de Gin, si es necesario
-		c.Set("tokenDecoded", tokenDecoded)
-		c.Next() // Continuar con el siguiente middleware o controlador
+
+		id := tokenDecoded["userId"].(string)
+		userId, err := strconv.Atoi(id)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, error.New("Unauthorized (Error decoded token)", http.StatusUnauthorized, err))
+			return
+
+		}
+
+		c.Set(string(userKey), userId)
+		c.Next()
 	}
 }

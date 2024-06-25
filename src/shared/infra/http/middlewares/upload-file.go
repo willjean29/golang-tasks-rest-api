@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+const fileKey contextKey = "filename"
+
 func UploadFile(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Parsea la solicitud
@@ -50,7 +52,7 @@ func UploadFile(next http.Handler) http.Handler {
 		}
 		// se crea la url del archivo
 		log.Println("filename ", handler.Filename)
-		ctx := context.WithValue(r.Context(), "filename", handler.Filename)
+		ctx := context.WithValue(r.Context(), fileKey, handler.Filename)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
