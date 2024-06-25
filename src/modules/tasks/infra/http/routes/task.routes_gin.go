@@ -1,37 +1,23 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"app/src/modules/tasks/infra/http/controllers"
+	"app/src/shared/infra/http/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 func TaskRoutesGin(router *gin.RouterGroup) {
+	var tasksController = controllers.TaskControllerGin{}
 	taskRoutes := router.Group("/tasks")
+	taskRoutes.Use(middlewares.AuthenticatedGin())
+	taskRoutes.GET("/", tasksController.List)
 
-	taskRoutes.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "List all tasks",
-		})
-	})
+	taskRoutes.GET("/:id", tasksController.Show)
 
-	taskRoutes.GET("/:id", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "Show a task",
-		})
-	})
+	taskRoutes.POST("/", tasksController.Create)
 
-	taskRoutes.POST("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "Create a task",
-		})
-	})
+	taskRoutes.PUT("/:id", tasksController.Update)
 
-	taskRoutes.PUT("/:id", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "Update a task",
-		})
-	})
-
-	taskRoutes.DELETE("/:id", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "Delete a task",
-		})
-	})
+	taskRoutes.DELETE("/:id", tasksController.Delete)
 }
