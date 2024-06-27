@@ -33,6 +33,7 @@ func (s *ServerGin) DBConnectionGin() {
 }
 
 func (s *ServerGin) RoutesGin() {
+	s.router.Static("/api/uploads", "./uploads")
 	routes.RoutesGin(s.router)
 }
 
